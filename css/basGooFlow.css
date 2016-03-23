@@ -1,0 +1,162 @@
+/* 清除内外边距 */
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, /* structural elements 结构元素 */
+dl, dt, dd, ul, ol, li, /* list elements 列表元素 */
+pre, /* text formatting elements 文本格式元素 */
+fieldset, lengend, button, input, textarea, /* form elements 表单元素 */
+th, td { /* table elements 表格元素 */
+    margin: 0;
+    padding: 0;
+}
+
+/* 设置默认字体 */
+body,
+button, input, select, textarea { /* for ie */
+    /*font: 12px/1 Tahoma, Helvetica, Arial, "宋体", sans-serif;*/
+    font: 14px/1 'Microsoft YaHei', Arial, sans-serif; /* 用 ascii 字符表示，使得在任何编码下都无问题 */
+}
+
+h1 { font-size: 18px; /* 18px / 12px = 1.5 */ }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+h4, h5, h6 { font-size: 100%; }
+
+address, cite, dfn, em, var { font-style: normal; } /* 将斜体扶正 */
+code, kbd, pre, samp, tt { font-family: "Courier New", Courier, monospace; } /* 统一等宽字体 */
+small { font-size: 12px; } /* 小于 12px 的中文很难阅读，让 small 正常化 */
+
+/* 重置列表元素 */
+ul, ol { list-style: none; }
+
+/* 重置文本格式元素 */
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* 重置表格元素 */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+/* 重置 hr */
+hr {
+    border: none;
+    height: 1px;
+}
+.clearfix {
+  *zoom: 1;
+}
+
+.clearfix:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+html{
+	overflow: hidden;
+}
+
+
+.GooFlow {
+
+}
+.GooFlow_head,
+.GooFlow_tool,
+.GooFlow_work{
+	box-sizing:border-box;
+}
+
+.GooFlow_head {
+	clear: both;
+	height: 45px;
+	background: #2483d7;
+}
+.GooFlow_tool {
+	background: #fdfce9;
+	width: 30%;
+	float: left;
+	border-right:1px solid #efd586;
+}
+
+.GooFlow_work {
+	width: 70%;
+	float: right;
+	overflow-y: scroll;
+}
+
+
+/*nav*/
+.nav-tabs{
+	*zoom: 1;
+	background: #ffe9a3;
+	border-bottom: 1px solid #efd586;
+	padding-top: 5px;
+}
+.nav-tabs:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.nav-tabs li{
+	float: left;
+	overflow: bottom;
+}
+.nav-tabs li a{
+	display: block;
+	margin-bottom: -1px;
+	padding: 2px 36px;
+	line-height: 1.5;
+	color: #616161;
+	margin-left: 5px;
+}
+.nav-tabs li a:hover{
+	text-decoration: none;
+}
+.nav-tabs li.active a{
+	color: #bf6f2f;
+	background: #fdfce9;
+	border: 1px solid #efd586;
+	border-radius: 10px 10px 0 0 ;
+	border-bottom-color: transparent;
+}
+
+.nav-cnts{
+	padding: 0 15px;
+}
+
+
+/*控件*/
+.control-title{
+	font-size: 15px;
+	margin: 20px 0 0px;
+	font-weight: bold;
+	color: #15428B;
+}
+.control-group{
+	*zoom: 1;
+}
+.control-group:after{
+	content: "";
+  	display: block;
+  	clear: both;
+}
+.control-group>li{
+	float: left;
+	width: 50%;
+}
+
+.control{
+	width: 90%;
+	height: 25px;
+	line-height: 22px;
+	background: #eaeaea;
+	margin-top: 20px;
+	background-image: linear-gradient(to top, #efefef, #ffffff);
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	cursor: default;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: center;
+}

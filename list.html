@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="./jqueryUI/jquery-ui.min.css">
+	<script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
+	<script src="./lib/jqueryUI/jquery-ui.js"></script>
+	<style>
+		*{
+			padding: 0px;
+			margin: 0px;
+		}
+		.clearfix {
+		  *zoom: 1;
+		}
+		.clearfix:after {
+		  content: "\200B";
+		  display: block;
+		  height: 0;
+		  clear: both;
+		}
+
+		.process{
+			width: 80px;
+			height: 46px;
+			position: relative;
+			overflow: hidden;
+			/*background:#A5CFEB;*/
+			margin: 60px;
+		}
+		
+		.process .pl,
+		.process .pc,
+		.process .pr{
+			float: left;
+		}
+
+		.process .pl{
+			height: 100%;
+		}
+		.process .pl .st,
+		.process .pl .sd{
+			width: 0;
+		    height: 0;
+		    border-left: 23px solid transparent; 
+		}
+
+		.process .pl .st{
+		    border-top: 23px solid #A5CFEB;
+		}
+		.process .pl .sd{
+		    border-bottom: 23px solid #A5CFEB;
+		}
+		
+		.process .pc{
+			float: left;
+			width: 34px;
+			height: 100%;
+			background:#A5CFEB;
+		}
+
+		.process .pr{
+			float: right;
+			width: 0;
+			height: 0;
+			border: 23px solid transparent;
+			border-bottom-width:23px; 
+			border-left-color: #A5CFEB;
+			border-right: none;
+		}
+
+		.process-start .pl{
+			width: 23px;
+			height: 100%;
+			background: #A5CFEB;
+			border: none;
+		}
+
+		.process-end .pr{
+			width: 23px;
+			height: 100%;
+			background: #A5CFEB;
+			border: none;
+		}
+
+		.bi,
+		.wi{
+			position: absolute;
+			width: 0;
+			height: 0;
+			border-top: 23px solid transparent;
+			border-bottom: 23px solid transparent;
+			border-left: 23px solid #A5CFEB;
+			right: -23px;
+		}
+		.wi{
+			right: auto;
+			border-left-color: #fff;
+		}
+	
+
+		.ui-resizable-helper{
+			border: 1px dashed #8EA4C1;
+		}
+
+		.guide{
+		    display: none; 
+		    position: absolute; 
+		    left: 0; 
+		    top: 0; 
+		}
+
+		#guide-h{
+		    border-top: 1px dashed #55f; 
+		    width: 100%; 
+		}
+
+		#guide-v{
+		    border-left: 1px dashed #55f; 
+		    height: 100%; 
+		}
+		
+
+		/*.draggable{
+		    border: 1px solid #ccc; 
+		    display: inline-block; 
+		    cursor: move;
+		    position: absolute;         
+		}*/
+	</style>
+</head>
+<body>
+	<!-- <div class="draggable">drag me!</div>
+	<div class="draggable">you can drag me too, if you like</div>
+	<div class="draggable">hep hep</div>
+ -->
+	<div id="guide-h" class="guide"></div>
+	<div id="guide-v" class="guide"></div>
+
+	<div class="process clearfix process-start">
+		<div class="pl">
+			<div class="st"></div>
+			<div class="sd"></div>
+		</div>
+		<div class="pc"></div>
+		<div class="pr"></div>
+	</div>
+	<div class="process clearfix  process-middle">
+		<div class="pl">
+			<div class="st"></div>
+			<div class="sd"></div>
+		</div>
+		<div class="pc"></div>
+		<div class="pr"></div>
+	</div>
+	<div class="process clearfix  process-middle">
+		<div class="pl">
+			<div class="st"></div>
+			<div class="sd"></div>
+		</div>
+		<div class="pc"></div>
+		<div class="pr"></div>
+	</div>
+	<div class="process clearfix  process-middle">
+		<div class="pl">
+			<div class="st"></div>
+			<div class="sd"></div>
+		</div>
+		<div class="pc"></div>
+		<div class="pr"></div>
+	</div>
+	<div class="process clearfix process-end">
+		<div class="pl">
+			<div class="st"></div>
+			<div class="sd"></div>
+		</div>
+		<div class="pc"></div>
+		<div class="pr"></div>
+	</div>
+	<script src="./list.js"></script>
+</body>
+</html>
