@@ -60,6 +60,12 @@
 			var templ = this.options.toolsTempl || '<div class="GooFlow_tool"><ul class="nav nav-tabs"><li class="active"><a href="javascript:;">控件</a></li><li><a href="javascript:;">属性</a></li></ul><ul class="nav nav-cnts"><li class="J_toolsBox"></li><li style="display:none;"></li></ul></div>';
 			this.$tools = $(templ);
 			this.$toolsBox = this.$container.append(this.$tools).find('.J_toolsBox');
+			//添加基本控件
+			this._addToolsGroup('基本控件', [{
+				name: '选择'
+			}, {
+				name: '连接线'
+			}]);
 		},
 
 		_initWorkArea: function () {
@@ -80,6 +86,23 @@
 			}).trigger('resize');
 		},
 
+
+		_addToolsGroup: function (title, group) {
+			if (!$.isArray(group) || group.length == 0) {
+				return '';
+			}
+			var templ = '',
+				i;
+			templ += '<h4 class="control-title">' + title + '</h4>';
+			templ += '<ul class="control-group">';
+			for (i = 0; i < group.length; i++) {
+				templ += '<li><div class="control"><span class="' + group[i].icon + '"></span><span>' + group[i].name + '</span></div></li>';
+			}
+			templ += '</ul>';
+
+			this.$toolsBox.append(templ);
+		},
+
 		_createSVGArea: function () {
 
 		},
@@ -88,6 +111,18 @@
 
 		}
 	}
+
+
+	function Control() {
+		this.uid = '';
+		this.name = '控件';
+		this.type = '';
+		this.left = 0;
+		this.top = 0;
+		this.width = 0;
+		this.height = 0;
+	}
+
 
 
 	$.fn.extend({
