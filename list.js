@@ -25,7 +25,7 @@ $('.process').resizable({
 		else {
 			$this.find('.pr').css('borderWidth', _w + 'px');
 		}
-	}
+	} 
 });
   
 

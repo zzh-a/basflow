@@ -46,10 +46,15 @@ hr {
 }
 
 .clearfix:after {
-  content: "";
+  content: "\200B";
   display: block;
+  height: 0;
   clear: both;
 }
+.crosshair{
+	cursor:crosshair !important;	
+}
+
 
 html{
 	overflow: hidden;
@@ -78,9 +83,15 @@ html{
 }
 
 .GooFlow_work {
+	position: relative;
 	width: 70%;
 	float: right;
 	overflow-y: scroll;
+}
+.GooFlow_workArea{
+	position: absolute;
+	top: 0px;
+	left: 0px;
 }
 
 
@@ -125,27 +136,28 @@ html{
 
 
 /*控件*/
-.control-title{
+.tools-title{
 	font-size: 15px;
 	margin: 20px 0 0px;
 	font-weight: bold;
 	color: #15428B;
 }
-.control-group{
+.tools-group{
 	*zoom: 1;
 }
-.control-group:after{
+.tools-group:after{
 	content: "";
   	display: block;
   	clear: both;
 }
-.control-group>li{
+.tools-group>li{
 	float: left;
 	width: 50%;
 }
 
-.control{
+.tools{
 	width: 90%;
+	/*width: 100px;*/
 	height: 25px;
 	line-height: 22px;
 	background: #eaeaea;
@@ -159,4 +171,194 @@ html{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	text-align: center;
+}
+
+
+/*--------------组件样式---------------*/
+.ui-resizable-helper{
+	border: 1px dashed #8EA4C1;
+	z-index: 1100;
+}
+
+
+.control.cur{
+	z-index: 10;
+	border: 1px solid #A1DCEB;
+}
+
+.control .ui-resizable-handle{
+	display: none !important;
+}
+
+.control .rs_remove{
+	display: none;
+	position:absolute;
+	right:1px;top:1px;
+	width:7px;height:7px;
+	overflow:hidden;
+	cursor:pointer;
+	background:url(../img/gooflow_tip.png) no-repeat 0px 0px
+}
+
+.control.cur .ui-resizable-handle,
+.control.cur .rs_remove{
+	display: block !important;
+}
+
+.control {
+	font-size: 12px;
+	color:rgb(21, 66, 139);
+	width: 100px;
+	height: 46px;
+	position: absolute !important;
+	cursor: default;
+} 
+
+.control-mark{
+	border: 1px solid;
+}
+
+
+
+
+.control .text{
+	width: 100%;
+	height: 100%;
+	display: table;
+	position: absolute;
+}
+.control .text span{
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.control-label{
+	background: #fffd66;
+	border-radius: 3px;
+	box-shadow:1px 1px 2px rgba(148,170,194,2);
+}
+
+
+
+
+
+
+
+
+
+/*-----------------------------------*/
+
+
+
+
+
+.process{
+	width: 100px;
+	height: 46px;
+	position: absolute;
+	overflow: hidden;
+	/*background:#A5CFEB;*/
+	/*margin: 60px;*/
+}
+
+.process .pl,
+.process .pc,
+.process .pr{
+	float: left;
+}
+
+.process .pl{
+	height: 100%;
+}
+.process .pl .st,
+.process .pl .sd{
+	width: 0;
+    height: 0;
+    border-left: 23px solid transparent; 
+}
+
+.process .pl .st{
+    border-top: 23px solid #A5CFEB;
+}
+.process .pl .sd{
+    border-bottom: 23px solid #A5CFEB;
+}
+
+.process .pc{
+	float: left;
+	width: 54px;
+	height: 100%;
+	background:#A5CFEB;
+}
+
+.process .pr{
+	float: right;
+	width: 0;
+	height: 0;
+	border: 23px solid transparent;
+	border-bottom-width:23px; 
+	border-left-color: #A5CFEB;
+	border-right: none;
+}
+
+.process-start .pl{
+	width: 23px;
+	height: 100%;
+	background: #A5CFEB;
+	border: none;
+}
+
+.process-end .pr{
+	width: 23px;
+	height: 100%;
+	background: #A5CFEB;
+	border: none;
+}
+
+.process .text{
+	width: 100%;
+	height: 100%;
+	display: table;
+	position: absolute;
+}
+.process .text span{
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.bi,
+.wi{
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-top: 23px solid transparent;
+	border-bottom: 23px solid transparent;
+	border-left: 23px solid #A5CFEB;
+	right: -23px;
+}
+.wi{
+	right: auto;
+	border-left-color: #fff;
+}
+
+
+
+
+.guide{
+    display: none; 
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+}
+
+#guide-h{
+    border-top: 1px dashed #55f; 
+    width: 100%; 
+}
+
+#guide-v{
+    border-left: 1px dashed #55f; 
+    height: 100%; 
 }

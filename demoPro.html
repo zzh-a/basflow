@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title>basDemo</title>
     <link rel="stylesheet" href="./css/basGooFlow.css" type="text/css" >
-    <script type="text/javascript" src="./lib/jquery.min.js"></script>
-    <script type="text/javascript" src="./js/GooFlowPro.js"></script>
+    <link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
+    <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
+    <script src="./lib/jqueryUI/jquery-ui.js"></script>
+    <script src="./lib/doT.min.js"></script>
+    <script src="./js/GooFlowPro.js"></script>
   </head>
   <body>
     <!-- <div class="GooFlow">
@@ -23,28 +26,28 @@
         </ul>
         <ul class="nav nav-cnts">
           <li>
-            <h4 class="control-title">基本控件</h4>
-            <ul class="control-group">
+            <h4 class="tools-title">基本控件</h4>
+            <ul class="tools-group">
               <li>
-                <div class="control">
+                <div class="tools">
                   <span class="icon-select"></span>
                   <span>选择</span>
                 </div>
               </li>
               <li>
-                <div class="control">
+                <div class="tools">
                   <span class="icon-link"></span>
                   <span>连接线</span>
                 </div>
               </li>
               <li>
-                <div class="control">
+                <div class="tools">
                   <span class="icon-select"></span>
                   <span>选择</span>
                 </div>
               </li>
               <li>
-                <div class="control">
+                <div class="tools">
                   <span class="icon-link"></span>
                   <span>连接线</span>
                 </div>
@@ -59,16 +62,34 @@
       <div class="GooFlow_work"></div>
     </div> -->
     <div id="basGooFlow"></div>
-    <script>
-      var toosGroup = [{
-        name: '组件控件',
-        controls: ['','']
-      },{
-        name: '泳道',
-        controls: ['']
-      }];
 
-      $('#basGooFlow').createGooFlow({});
+    <script id="label_templ" type="text/x-dot-template">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" class="control control-label {{= it.isHelper ? 'helper' : '' }}">
+            <div class="text">
+              <span>{{= it.name }}</span>
+            </div>
+            <div class="rs_remove J_remove"></div>
+         </div>
     </script>
+
+    <script>
+     $(function(){
+         var toolsGroup = [{
+          name: '组件控件',
+          controls: ['label']
+        },{
+          name: '泳道',
+          controls: ['']
+        }];
+        $('#basGooFlow').createGooFlow({
+          toolsGroup : toolsGroup
+        });
+     });
+    </script>
+
+
+
+    
+
   </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<link rel="stylesheet" href="./jqueryUI/jquery-ui.min.css">
+	<link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
 	<script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
 	<script src="./lib/jqueryUI/jquery-ui.js"></script>
 	<style>
@@ -84,6 +84,18 @@
 			border: none;
 		}
 
+		.process .text{
+			width: 100%;
+			height: 100%;
+			display: table;
+			position: absolute;
+		}
+		.process .text span{
+			display: table-cell;
+			vertical-align: middle;
+			text-align: center;
+		}
+
 		.bi,
 		.wi{
 			position: absolute;
@@ -139,6 +151,9 @@
 	<div id="guide-v" class="guide"></div>
 
 	<div class="process clearfix process-start">
+		<div class="text">
+			<span>文本域</span>
+		</div>
 		<div class="pl">
 			<div class="st"></div>
 			<div class="sd"></div>
@@ -147,6 +162,9 @@
 		<div class="pr"></div>
 	</div>
 	<div class="process clearfix  process-middle">
+	<div class="text">
+			<span>文本域</span>
+		</div>
 		<div class="pl">
 			<div class="st"></div>
 			<div class="sd"></div>

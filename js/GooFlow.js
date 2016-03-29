@@ -139,12 +139,17 @@ function GooFlow(bgDiv, property) {
 			"onselect": 'document.selection.empty()'
 		});
 	this.$el.children(".GooFlow_work").append(this.$workArea);
+
+
 	this.$draw = null; //画矢量线条的容器
 	this.initDraw("draw_" + this.$id, width, height);
+
+
 	this.$group = null;
 	if (property.haveGroup)
 		this.initGroup(width, height);
 	if (this.$editable) {
+
 		this.$workArea.on("click", {
 			inthis: this
 		}, function (e) {
@@ -181,6 +186,9 @@ function GooFlow(bgDiv, property) {
 			});
 			This.$max++;
 		});
+
+
+
 		//划线或改线时用的绑定
 		this.$workArea.mousemove({
 			inthis: this
@@ -234,8 +242,12 @@ function GooFlow(bgDiv, property) {
 				This.$lineOper.removeData("tid");
 			}
 		});
+
 		//为了结点而增加的一些集体delegate绑定
 		this.initWorkForNode();
+
+
+
 		//对结点进行移动或者RESIZE时用来显示的遮罩层
 		this.$ghost = $("<div class='rs_ghost'></div>").attr({
 			"unselectable": "on",
@@ -245,8 +257,11 @@ function GooFlow(bgDiv, property) {
 		this.$el.append(this.$ghost);
 		this.$textArea = $("<textarea></textarea>");
 		this.$el.append(this.$textArea);
+
+
 		this.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>"); //操作折线时的移动框
 		this.$workArea.append(this.$lineMove);
+
 		this.$lineMove.on("mousedown", {
 			inthis: this
 		}, function (e) {
@@ -309,6 +324,8 @@ function GooFlow(bgDiv, property) {
 				document.onmouseup = null;
 			}
 		});
+
+
 		//选定一条转换线后出现的浮动操作栏，有改变线的样式和删除线等按钮。
 		this.$lineOper = $("<div class='GooFlow_line_oper' style='display:none'><i class='b_l1'></i><i class='b_l2'></i><i class='b_l3'></i><i class='b_x'></i></div>"); //选定线时显示的操作框
 		this.$workArea.parent().append(this.$lineOper);
@@ -335,6 +352,8 @@ function GooFlow(bgDiv, property) {
 				break;
 			}
 		});
+
+
 		//新增移动线两个端点至新的结点功能移动功能，这里要提供移动用的DOM
 		this.$mpFrom = $("<div class='GooFlow_line_mp' style='display:none'></div>");
 		this.$mpTo = $("<div class='GooFlow_line_mp' style='display:none'></div>");
@@ -398,12 +417,14 @@ function GooFlow(bgDiv, property) {
 					this.$isUndo = 0;
 				}
 			};
+
 			//将外部的方法加入到GooFlow对象的事务操作堆栈中,在过后的undo/redo操作中可以进行控制，一般用于对流程图以外的附加信息进行编辑的事务撤销/重做控制；
 			//传参func为要执行方法对象,jsonPara为外部方法仅有的一个面向字面的JSON传参,由JSON对象带入所有要传的信息；
 			//提示:为了让外部方法能够被UNDO/REDO,需要在编写这些外部方法实现时,加入对该方法执行后效果回退的另一个执行方法的pushExternalOper
 			this.pushExternalOper = function (func, jsonPara) {
 				this.pushOper("externalFunc", [func, jsonPara]);
 			};
+
 			//撤销上一步操作
 			this.undo = function () {
 				if (this.$undoStack.length == 0) return;
@@ -440,6 +461,7 @@ function GooFlow(bgDiv, property) {
 					}
 				}
 			};
+
 			//重做最近一次被撤销的操作
 			this.redo = function () {
 				if (this.$redoStack.length == 0) return;
@@ -476,7 +498,9 @@ function GooFlow(bgDiv, property) {
 					}
 				}
 			};
+
 		}
+
 		$(document).keydown({
 			inthis: this
 		}, function (e) {
@@ -490,6 +514,7 @@ function GooFlow(bgDiv, property) {
 				break;
 			}
 		});
+
 	}
 }
 GooFlow.prototype = {
@@ -521,6 +546,8 @@ GooFlow.prototype = {
 			defs.appendChild(GooFlow.prototype.getSvgMarker("arrow1", GooFlow.prototype.color.line || "#3892D3"));
 			defs.appendChild(GooFlow.prototype.getSvgMarker("arrow2", GooFlow.prototype.color.mark || "#ff3300"));
 			defs.appendChild(GooFlow.prototype.getSvgMarker("arrow3", GooFlow.prototype.color.mark || "#ff3300"));
+
+
 		}
 		else {
 			this.$draw = document.createElement("v:group");
@@ -528,6 +555,9 @@ GooFlow.prototype = {
 			this.$workArea.prepend("<div class='GooFlow_work_vml' style='position:relative;width:" + width * 3 + "px;height:" + height * 3 + "px'></div>");
 			this.$workArea.children("div")[0].insertBefore(this.$draw, null);
 		}
+
+
+
 		this.$draw.id = id;
 		this.$draw.style.width = width * 3 + "px";
 		this.$draw.style.height = +height * 3 + "px";
@@ -796,6 +826,7 @@ GooFlow.prototype = {
 			}
 		});
 	},
+
 	//初始化用来改变连线的连接端点的两个小方块的操作事件
 	initLinePointsChg: function () {
 		this.$mpFrom.on("mousedown", {
@@ -833,6 +864,7 @@ GooFlow.prototype = {
 			return false;
 		});
 	},
+
 	//每一种类型结点及其按钮的说明文字
 	setNodeRemarks: function (remark) {
 		if (this.$tool == null) return;
@@ -861,6 +893,7 @@ GooFlow.prototype = {
 		}
 		if (this.$textArea.css("display") == "none") this.$textArea.removeData("id").val("").hide();
 	},
+
 	//增加一个流程结点,传参为一个JSON,有id,name,top,left,width,height,type(结点类型)等属性
 	addNode: function (id, json) {
 		if (this.onItemAdd != null && !this.onItemAdd(id, "node", json)) return;
@@ -916,6 +949,7 @@ GooFlow.prototype = {
 			if (this.$deletedItem[id]) delete this.$deletedItem[id]; //在回退删除操作时,去掉该元素的删除记录
 		}
 	},
+
 	initWorkForNode: function () {
 		//绑定点击事件
 		this.$workArea.delegate(".GooFlow_item", "click", {
@@ -924,6 +958,7 @@ GooFlow.prototype = {
 			e.data.inthis.focusItem(this.id, true);
 			$(this).removeClass("item_mark");
 		});
+
 		//绑定用鼠标移动事件
 		this.$workArea.delegate(".ico", "mousedown", {
 			inthis: this
@@ -986,7 +1021,9 @@ GooFlow.prototype = {
 				document.onmouseup = null;
 			}
 		});
+
 		if (!this.$editable) return;
+
 		//绑定鼠标覆盖/移出事件
 		this.$workArea.delegate(".GooFlow_item", "mouseenter", {
 			inthis: this
@@ -994,6 +1031,7 @@ GooFlow.prototype = {
 			if (e.data.inthis.$nowType != "direct" && !document.getElementById("GooFlow_tmp_line")) return;
 			$(this).addClass("item_mark").addClass("crosshair").css("border-color", GooFlow.prototype.color.mark || "#ff3300");
 		});
+
 		this.$workArea.delegate(".GooFlow_item", "mouseleave", {
 			inthis: this
 		}, function (e) {
@@ -1006,6 +1044,9 @@ GooFlow.prototype = {
 				$(this).css("border-color", GooFlow.prototype.color.node || "#A1DCEB");
 			}
 		});
+
+
+
 		//绑定连线时确定初始点
 		this.$workArea.delegate(".GooFlow_item", "mousedown", {
 			inthis: this
@@ -1026,6 +1067,8 @@ GooFlow.prototype = {
 			var line = GooFlow.prototype.drawLine("GooFlow_tmp_line", [X, Y], [X, Y], true, true);
 			This.$draw.appendChild(line);
 		});
+
+
 		//绑定连线时确定结束点
 		this.$workArea.delegate(".GooFlow_item", "mouseup", {
 			inthis: this
@@ -1060,6 +1103,9 @@ GooFlow.prototype = {
 				}
 			}
 		});
+
+
+
 		//绑定双击编辑事件
 		this.$workArea.delegate(".GooFlow_item > .span", "dblclick", {
 			inthis: this
@@ -1082,6 +1128,8 @@ GooFlow.prototype = {
 				This.$textArea.val("").removeData("id").hide();
 			});
 		});
+
+
 		this.$workArea.delegate(".ico + td", "dblclick", {
 			inthis: this
 		}, function (e) {
@@ -1103,6 +1151,8 @@ GooFlow.prototype = {
 				This.$textArea.val("").removeData("id").hide();
 			});
 		});
+
+
 		//绑定结点的删除功能
 		this.$workArea.delegate(".rs_close", "click", {
 			inthis: this
@@ -1111,6 +1161,8 @@ GooFlow.prototype = {
 			e.data.inthis.delNode(e.data.inthis.$focus);
 			return false;
 		});
+
+
 		//绑定结点的RESIZE功能
 		this.$workArea.delegate(".GooFlow_item > div > div[class!=rs_close]", "mousedown", {
 			inthis: this
@@ -1182,6 +1234,7 @@ GooFlow.prototype = {
 			}
 		});
 	},
+
 	//获取结点/连线/分组区域的详细信息
 	getItemInfo: function (id, type) {
 		switch (type) {
@@ -1193,6 +1246,7 @@ GooFlow.prototype = {
 			return this.$areaData[id] || null;
 		}
 	},
+
 	//取消所有结点/连线被选定的状态
 	blurItem: function () {
 		if (this.$focus != "") {
@@ -1231,6 +1285,7 @@ GooFlow.prototype = {
 		this.$focus = "";
 		return true;
 	},
+
 	//选定某个结点/转换线 bool:TRUE决定了要触发选中事件，FALSE则不触发选中事件，多用在程序内部调用。
 	focusItem: function (id, bool) {
 		var jq = $("#" + id);
@@ -1324,6 +1379,7 @@ GooFlow.prototype = {
 		this.$focus = id;
 		this.switchToolBtn("cursor");
 	},
+
 	//移动结点到一个新的位置
 	moveNode: function (id, left, top) {
 		if (!this.$nodeData[id]) return;
@@ -1346,6 +1402,7 @@ GooFlow.prototype = {
 			this.$nodeData[id].alt = true;
 		}
 	},
+
 	//设置结点/连线/分组区域的文字信息
 	setName: function (id, name, type) {
 		var oldName;
@@ -1421,6 +1478,7 @@ GooFlow.prototype = {
 			this.pushOper("setName", paras);
 		}
 	},
+
 	//设置结点的尺寸,仅支持非开始/结束结点
 	resizeNode: function (id, width, height) {
 		if (!this.$nodeData[id]) return;
@@ -1450,6 +1508,7 @@ GooFlow.prototype = {
 		//重画转换线
 		this.resetLines(id, this.$nodeData[id]);
 	},
+
 	//删除结点
 	delNode: function (id) {
 		if (!this.$nodeData[id]) return;
@@ -1480,11 +1539,13 @@ GooFlow.prototype = {
 				this.$deletedItem[id] = "node";
 		}
 	},
+
 	//设置流程图的名称
 	setTitle: function (text) {
 		this.$title = text;
 		if (this.$head) this.$head.children("label").attr("title", text).text(text);
 	},
+
 	//载入一组数据
 	loadData: function (data) {
 		var t = this.$editable;
@@ -1500,6 +1561,7 @@ GooFlow.prototype = {
 		this.$editable = t;
 		this.$deletedItem = {};
 	},
+
 	//用AJAX方式，远程读取一组数据
 	//参数para为JSON结构，与JQUERY中$.ajax()方法的传参一样
 	loadDataAjax: function (para) {
@@ -1519,6 +1581,7 @@ GooFlow.prototype = {
 			}
 		})
 	},
+
 	//把画好的整个流程图导出到一个变量中(其实也可以直接访问GooFlow对象的$nodeData,$lineData,$areaData这三个JSON属性)
 	exportData: function () {
 		var ret = {
@@ -1540,6 +1603,7 @@ GooFlow.prototype = {
 		}
 		return ret;
 	},
+
 	//只把本次编辑流程图中作了变更(包括增删改)的元素导出到一个变量中,以方便用户每次编辑载入的流程图后只获取变更过的数据
 	exportAlter: function () {
 		var ret = {
@@ -1565,6 +1629,7 @@ GooFlow.prototype = {
 		ret.deletedItem = this.$deletedItem;
 		return ret;
 	},
+
 	//变更元素的ID,一般用于快速保存后,将后台返回新元素的ID更新到页面中;type为元素类型(节点,连线,区块)
 	transNewId: function (oldId, newId, type) {
 		var tmp;
@@ -1601,6 +1666,7 @@ GooFlow.prototype = {
 			break;
 		}
 	},
+
 	//清空工作区及已载入的数据
 	clearData: function () {
 		for (var key in this.$nodeData) {
@@ -1614,6 +1680,7 @@ GooFlow.prototype = {
 		}
 		this.$deletedItem = {};
 	},
+
 	//销毁自己
 	destrory: function () {
 		this.$el.empty();
@@ -1628,7 +1695,9 @@ GooFlow.prototype = {
 		this.$areaCount = 0;
 		this.$deletedItem = {};
 	},
-	///////////以下为有关画线的方法
+
+
+	/*------------------------------------------以下为有关画线的方法-----------------------------------------*/
 	//绘制一条箭头线，并返回线的DOM
 	drawLine: function (id, sp, ep, mark, dash) {
 		var line;
@@ -1703,6 +1772,7 @@ GooFlow.prototype = {
 		}
 		return line;
 	},
+
 	//画一条只有两个中点的折线
 	drawPoly: function (id, sp, m1, m2, ep, mark) {
 		var poly, strPath;
@@ -1779,6 +1849,7 @@ GooFlow.prototype = {
 		}
 		return poly;
 	},
+
 	//计算两个结点间要连直线的话，连线的开始坐标和结束坐标
 	calcStartEnd: function (n1, n2) {
 		var X_1, Y_1, X_2, Y_2;
@@ -1852,6 +1923,7 @@ GooFlow.prototype = {
 			"end": [X_2, Y_2]
 		};
 	},
+
 	//计算两个结点间要连折线的话，连线的所有坐标
 	calcPolyPoints: function (n1, n2, type, M) {
 		//开始/结束两个结点的中心
@@ -1925,6 +1997,7 @@ GooFlow.prototype = {
 			end: ep
 		};
 	},
+
 	//初始化折线中段的X/Y坐标,mType='rb'时为X坐标,mType='tb'时为Y坐标
 	getMValue: function (n1, n2, mType) {
 		if (mType == "lr") {
@@ -1934,6 +2007,7 @@ GooFlow.prototype = {
 			return (n1.top + n1.height / 2 + n2.top + n2.height / 2) / 2;
 		}
 	},
+
 	//原lineData已经设定好的情况下，只在绘图工作区画一条线的页面元素
 	addLineDom: function (id, lineData) {
 		var n1 = this.$nodeData[lineData.from],
@@ -1970,6 +2044,7 @@ GooFlow.prototype = {
 		}
 		else this.$lineDom[id].childNodes[2].textContent = lineData.name;
 	},
+
 	//增加一条线
 	addLine: function (id, json) {
 		if (this.onItemAdd != null && !this.onItemAdd(id, "line", json)) return;
@@ -2007,6 +2082,7 @@ GooFlow.prototype = {
 			if (this.$deletedItem[id]) delete this.$deletedItem[id]; //在回退删除操作时,去掉该元素的删除记录
 		}
 	},
+
 	//重构所有连向某个结点的线的显示，传参结构为$nodeData数组的一个单元结构
 	resetLines: function (id, node) {
 		for (var i in this.$lineData) {
@@ -2058,6 +2134,7 @@ GooFlow.prototype = {
 			else this.$lineDom[i].childNodes[2].textContent = this.$lineData[i].name;
 		}
 	},
+
 	//重新设置连线的样式 newType= "sl":直线, "lr":中段可左右移动型折线, "tb":中段可上下移动型折线
 	setLineType: function (id, newType, M) {
 		if (!newType || newType == null || newType == "" || newType == this.$lineData[id].type) return false;
@@ -2104,6 +2181,7 @@ GooFlow.prototype = {
 			this.$lineData[id].alt = true;
 		}
 	},
+
 	//设置折线中段的X坐标值（可左右移动时）或Y坐标值（可上下移动时）
 	setLineM: function (id, M, noStack) {
 		if (!this.$lineData[id] || M < 0 || !this.$lineData[id].type || this.$lineData[id].type == "sl") return false;
@@ -2135,6 +2213,7 @@ GooFlow.prototype = {
 			this.$lineData[id].alt = true;
 		}
 	},
+
 	//删除转换线
 	delLine: function (id) {
 		if (!this.$lineData[id]) return;
@@ -2157,6 +2236,7 @@ GooFlow.prototype = {
 		}
 		this.$lineOper.hide().removeData("tid");
 	},
+
 	//变更连线两个端点所连的结点
 	//参数：要变更端点的连线ID，新的开始结点ID、新的结束结点ID；如果开始/结束结点ID是传入null或者""，则表示原端点不变
 	moveLinePoints: function (lineId, newStart, newEnd, noStack) {
@@ -2232,7 +2312,11 @@ GooFlow.prototype = {
 			this.pushOper("markItem", paras);
 		}
 	},
-	////////////////////////以下为区域分组块操作
+
+
+
+
+	/*------------------------------------------以下为区域分组块操作-----------------------------------------*/
 	moveArea: function (id, left, top) {
 		if (!this.$areaData[id]) return;
 		if (this.onItemMove != null && !this.onItemMove(id, "area", left, top)) return;
@@ -2252,6 +2336,7 @@ GooFlow.prototype = {
 			this.$areaData[id].alt = true;
 		}
 	},
+
 	//删除区域分组
 	delArea: function (id) {
 		if (!this.$areaData[id]) return;
@@ -2270,6 +2355,7 @@ GooFlow.prototype = {
 				this.$deletedItem[id] = "area";
 		}
 	},
+
 	//设置区域分组的颜色
 	setAreaColor: function (id, color) {
 		if (!this.$areaData[id]) return;
@@ -2285,6 +2371,7 @@ GooFlow.prototype = {
 			this.$areaData[id].alt = true;
 		}
 	},
+
 	//设置区域分块的尺寸
 	resizeArea: function (id, width, height) {
 		if (!this.$areaData[id]) return;
@@ -2311,6 +2398,7 @@ GooFlow.prototype = {
 			this.$areaData[id].alt = true;
 		}
 	},
+
 	addArea: function (id, json) {
 		if (this.onItemAdd != null && !this.onItemAdd(id, "area", json)) return;
 		if (this.$undoStack && this.$editable) {
@@ -2326,6 +2414,7 @@ GooFlow.prototype = {
 			if (this.$deletedItem[id]) delete this.$deletedItem[id]; //在回退删除操作时,去掉该元素的删除记录
 		}
 	},
+
 	//重构整个流程图设计器的宽高
 	reinitSize: function (width, height) {
 		var w = (width || 800) - 2;
