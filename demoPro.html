@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
     <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
     <script src="./lib/jqueryUI/jquery-ui.js"></script>
+    <script src="./lib/underscore/underscore-min.js"></script>
     <script src="./lib/doT.min.js"></script>
     <script src="./js/GooFlowPro.js"></script>
   </head>
@@ -64,7 +65,7 @@
     <div id="basGooFlow"></div>
 
     <script id="label_templ" type="text/x-dot-template">
-         <div id="{{= it.id }}" data-type="{{= it.type }}" class="control control-label {{= it.isHelper ? 'helper' : '' }}">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" style="width:{{= it.width }};height:{{= it.height }};"  onselectstart="return false" class="control control-label {{= it.isHelper ? 'helper' : '' }}">
             <div class="text">
               <span>{{= it.name }}</span>
             </div>

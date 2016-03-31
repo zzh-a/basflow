@@ -2315,7 +2315,6 @@ GooFlow.prototype = {
 
 
 
-
 	/*------------------------------------------以下为区域分组块操作-----------------------------------------*/
 	moveArea: function (id, left, top) {
 		if (!this.$areaData[id]) return;
