@@ -51,10 +51,14 @@ hr {
   height: 0;
   clear: both;
 }
+
 .crosshair{
 	cursor:crosshair !important;	
 }
 
+.pointer{
+	cursor: pointer !important;
+}
 
 html{
 	overflow: hidden;
@@ -109,13 +113,39 @@ html{
 	position:absolute;z-index:9999;background:#333;cursor:crosshair
 }
 
-.GooFlow .GooFlow_line_move{filter:Alpha(Opacity=50);-moz-opacity:0.5;opacity:0.5;overflow:hidden;position:absolute;z-index:9999;background:url(0) no-repeat}
-.GooFlow .GooFlow_line_oper i{display:inline-block;width:15px;height:15px;margin-left:2px;cursor:pointer}
-.GooFlow .b_l1{background:url(img/GooFlow_line_oper.png) no-repeat 1px 1px}
-.GooFlow .b_l2{background:url(img/GooFlow_line_oper.png) no-repeat 1px -14px}
-.GooFlow .b_l3{background:url(img/GooFlow_line_oper.png) no-repeat 1px -29px}
-.GooFlow .b_x{background:url(img/GooFlow_line_oper.png) no-repeat 1px -44px;margin-left:10px}
+.GooFlow .GooFlow_line_move {
+	filter: Alpha(Opacity=50);
+	-moz-opacity: 0.5;
+	opacity: 0.5;
+	overflow: hidden;
+	position: absolute;
+	z-index: 9999;
+}
 
+.GooFlow .GooFlow_line_oper i {
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	margin-left: 2px;
+	cursor: pointer
+}
+
+.GooFlow .b_l1 {
+	background: url(../img/GooFlow_line_oper.png) no-repeat 1px 1px
+}
+
+.GooFlow .b_l2 {
+	background: url(../img/GooFlow_line_oper.png) no-repeat 1px -14px
+}
+
+.GooFlow .b_l3 {
+	background: url(../img/GooFlow_line_oper.png) no-repeat 1px -29px
+}
+
+.GooFlow .b_x {
+	background: url(../img/GooFlow_line_oper.png) no-repeat 1px -44px;
+	margin-left: 10px
+}
 /*nav*/
 .nav-tabs{
 	*zoom: 1;
@@ -177,13 +207,13 @@ html{
 }
 
 .tools{
+	color: #666;
 	width: 90%;
 	/*width: 100px;*/
 	height: 25px;
 	line-height: 22px;
-	background: #eaeaea;
 	margin-top: 20px;
-	background-image: linear-gradient(to top, #efefef, #ffffff);
+	background: url(../img/toolbg1.png) repeat-x;
 	border: 1px solid #ccc;
 	border-radius: 7px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -192,6 +222,11 @@ html{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	text-align: center;
+}
+
+.tools.active{
+	background: url(../img/toolbg2.png) repeat-x;
+	box-shadow: 2px 2px 3px #e3e3e3 inset;
 }
 
 
@@ -204,7 +239,8 @@ html{
 
 .control.cur{
 	z-index: 10;
-	border: 1px solid #A1DCEB;
+	border: 1px solid #8494DA;
+	cursor: move;
 }
 
 .control .ui-resizable-handle{
@@ -233,7 +269,13 @@ html{
 	height: 46px;
 	position: absolute !important;
 	cursor: default;
+	border: 1px solid transparent;
 } 
+
+.control img{
+	width: 100%;
+	height: 100%;
+}
 
 .control-mark{
 	border: 1px solid;

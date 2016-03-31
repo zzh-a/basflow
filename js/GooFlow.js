@@ -1,4 +1,4 @@
-﻿//定义一个区域图类：
+//定义一个区域图类：
 function GooFlow(bgDiv, property) {
 	if (navigator.userAgent.indexOf("MSIE 8.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0)
 		GooFlow.prototype.useSVG = "";
@@ -259,7 +259,7 @@ function GooFlow(bgDiv, property) {
 		this.$el.append(this.$textArea);
 
 
-		this.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>"); //操作折线时的移动框
+		this.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>"); 
 		this.$workArea.append(this.$lineMove);
 
 		this.$lineMove.on("mousedown", {
@@ -326,7 +326,7 @@ function GooFlow(bgDiv, property) {
 		});
 
 
-		//选定一条转换线后出现的浮动操作栏，有改变线的样式和删除线等按钮。
+		//
 		this.$lineOper = $("<div class='GooFlow_line_oper' style='display:none'><i class='b_l1'></i><i class='b_l2'></i><i class='b_l3'></i><i class='b_x'></i></div>"); //选定线时显示的操作框
 		this.$workArea.parent().append(this.$lineOper);
 		this.$lineOper.on("click", {
@@ -346,6 +346,7 @@ function GooFlow(bgDiv, property) {
 				break;
 			case "b_l2":
 				This.setLineType(id, "tb");
+				
 				break;
 			case "b_l3":
 				This.setLineType(id, "sl");
@@ -1307,6 +1308,8 @@ GooFlow.prototype = {
 				jq[0].childNodes[1].setAttribute("marker-end", "url(#arrow2)");
 			}
 			else jq[0].strokeColor = GooFlow.prototype.color.mark || "#ff3300";
+			
+
 			if (!this.$editable) return;
 			var x, y, from, to, n;
 			if (GooFlow.prototype.useSVG != "") {
@@ -2312,6 +2315,7 @@ GooFlow.prototype = {
 			this.pushOper("markItem", paras);
 		}
 	},
+
 
 
 
