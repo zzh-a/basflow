@@ -94,6 +94,23 @@ html{
 	left: 0px;
 }
 
+/*操作线相关*/
+.GooFlow .GooFlow_line_oper{
+	width:70px;height:15px;background-color:#D8E8FC;border:#7DA2CE 1px solid;position:absolute;
+	filter:Alpha(Opacity=50);-moz-opacity:0.5;opacity: 0.5;z-index:10000;
+}
+
+.GooFlow .GooFlow_line_mp{
+	width:9px;height:9px;filter:Alpha(Opacity=40);-moz-opacity:0.4;opacity:0.4;overflow:hidden;
+	position:absolute;z-index:9999;background:#333;cursor:crosshair
+}
+
+.GooFlow .GooFlow_line_move{filter:Alpha(Opacity=50);-moz-opacity:0.5;opacity:0.5;overflow:hidden;position:absolute;z-index:9999;background:url(0) no-repeat}
+.GooFlow .GooFlow_line_oper i{display:inline-block;width:15px;height:15px;margin-left:2px;cursor:pointer}
+.GooFlow .b_l1{background:url(img/GooFlow_line_oper.png) no-repeat 1px 1px}
+.GooFlow .b_l2{background:url(img/GooFlow_line_oper.png) no-repeat 1px -14px}
+.GooFlow .b_l3{background:url(img/GooFlow_line_oper.png) no-repeat 1px -29px}
+.GooFlow .b_x{background:url(img/GooFlow_line_oper.png) no-repeat 1px -44px;margin-left:10px}
 
 /*nav*/
 .nav-tabs{

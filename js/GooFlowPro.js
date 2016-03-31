@@ -1,7 +1,7 @@
 (function (window, $, undefined) {
 
 	var isIE678 = !+"\v1";
-	var useSve = isIE678 ? 0 : 1;
+	var useSVG = isIE678 ? 0 : 1;
 	var SVG_NS = 'http://www.w3.org/2000/svg';
 
 
@@ -163,6 +163,65 @@
 				me.focusControl(thisCtl);
 			});
 
+
+
+			//划线或改线时用的绑定
+			me.$workArea.on('mousemove', function (e) {
+				//if (e.data.inthis.$nowType != "direct" && !e.data.inthis.$mpTo.data("p")) return;
+				
+				var lineStart = me.$workArea.data("lineStart");
+				var lineEnd = me.$workArea.data("lineEnd");
+
+				if (!lineStart && !lineEnd) return;
+
+				var line = document.getElementById("GooFlow_tmp_line"),
+					toWorkOffset = me._getToWorkOffset(e),
+					X = toWorkOffset.left,
+					Y = toWorkOffset.top;
+
+				if (lineStart) {
+					if (useSVG) {
+						line.childNodes[0].setAttribute("d", "M " + lineStart.x + " " + lineStart.y + " L " + X + " " + Y);
+						line.childNodes[1].setAttribute("d", "M " + lineStart.x + " " + lineStart.y + " L " + X + " " + Y);
+						if (line.childNodes[1].getAttribute("marker-end") == "url(\"#arrow2\")")
+							line.childNodes[1].setAttribute("marker-end", "url(#arrow3)");
+						else line.childNodes[1].setAttribute("marker-end", "url(#arrow2)");
+					}
+				}
+				else if (lineEnd) {
+					if (useSVG) {
+						line.childNodes[0].setAttribute("d", "M " + X + " " + Y + " L " + lineEnd.x + " " + lineEnd.y);
+						line.childNodes[1].setAttribute("d", "M " + X + " " + Y + " L " + lineEnd.x + " " + lineEnd.y);
+						if (line.childNodes[1].getAttribute("marker-end") == "url(\"#arrow2\")")
+							line.childNodes[1].setAttribute("marker-end", "url(#arrow3)");
+						else line.childNodes[1].setAttribute("marker-end", "url(#arrow2)");
+					}
+				}
+			});
+
+			me.$workArea.on('mouseup', function (e) {
+				//if (me.$nowType != "direct" && !me.$mpTo.data("p")) return;
+				var tmp = document.getElementById("GooFlow_tmp_line");
+				if (tmp) {
+					me.$workArea.css("cursor", "auto").removeData("lineStart").removeData("lineEnd");
+					me.$mpTo.hide().removeData("p");
+					me.$mpFrom.hide().removeData("p");
+					me.$draw.removeChild(tmp);
+					//me.focusItem(me.$focus, false);
+				}
+				else {
+					me.$lineOper.removeData("tid");
+				}
+			});
+
+			
+
+
+			me._initLineOper();
+			me._initLinePoints();
+
+
+
 			me.$workArea.on('mouseenter', '.control', function (e) {
 				//if(me.editType !== me.EditEnum.DIRECT && !document.getElementById("GooFlow_tmp_line")) return;
 				$(this).addClass("control-mark").addClass("crosshair").css("border-color", me.options.color.mark);
@@ -171,6 +230,8 @@
 			me.$workArea.on('mouseleave', '.control', function (e) {
 				$(this).removeClass("control-mark").removeClass("crosshair").css("border-color", '');
 			});
+
+
 
 			me.$workArea.on('mousedown', '.control', function (e) {
 				if (e.button == 2) return false;
@@ -190,8 +251,41 @@
 				me.$draw.appendChild(line);
 			});
 
-			me.$workArea.on('mouseup', '.control', function () {
 
+
+			me.$workArea.on('mouseup', '.control', function (e) {
+
+				//if (me.$nowType != "direct" && !me.$mpTo.data("p")) return;
+				
+				var lineStart = me.$workArea.data("lineStart"),
+					lineEnd = me.$workArea.data("lineEnd");
+
+				if (lineStart && !me.$mpTo.data("p")) {
+					me.addLine({
+						from: lineStart.id,
+						to: this.id,
+						name: ""
+					});
+				}
+				else {
+					if (lineStart) {
+						me.moveLinePoints(me.$focus, lineStart.id, this.id);
+					}
+					else if (lineEnd) {
+						me.moveLinePoints(me.$focus, this.id, lineEnd.id);
+					}
+
+					if (!me.$nodeData[this.id].marked) {
+						$(this).removeClass("item_mark");
+						if (this.id != me.$focus) {
+							$(this).css("border-color", me.options.color.node);
+						}
+						else {
+							$(this).css("border-color", me.options.color.line);
+						}
+					}
+
+				}
 			});
 
 		},
@@ -336,17 +430,243 @@
 		},
 
 
+		/**
+		 * 初始化选定一条转换线后出现的浮动操作栏，有改变线的样式和删除线等按钮。
+		 */
+		_initLineOper: function(){
+			var me = this;
+			//选定线时显示的操作框
+			me.$lineOper = $("<div class='GooFlow_line_oper' style='display:none'><i class='b_l1'></i><i class='b_l2'></i><i class='b_l3'></i><i class='b_x'></i></div>"); 
+			me.$workArea.parent().append(me.$lineOper);
+			me.$lineOper.on("click", function (e) {
+				var e = e || window.event;
+				if (e.target.tagName != "I") return;
+				var id = $(this).data("tid");
+				switch ($(e.target).attr("class")) {
+				case "b_x":
+					me.delLine(id);
+					this.style.display = "none";
+					break;
+				case "b_l1":
+					me.setLineType(id, "lr");
+					break;
+				case "b_l2":
+					me.setLineType(id, "tb");
+					break;
+				case "b_l3":
+					me.setLineType(id, "sl");
+					break;
+				}
+			});
+		},
+
+		/**
+		 * 初始化用来改变连线的连接端点的两个小方块
+		 */
+		_initLinePoints: function () {
+			var me = this;
+			me.$mpFrom = $("<div class='GooFlow_line_mp' style='display:none'></div>");
+			me.$mpTo = $("<div class='GooFlow_line_mp' style='display:none'></div>");
+			me.$workArea.append(me.$mpFrom).append(me.$mpTo);
+
+			me.$mpFrom.on("mousedown", function (e) {
+				$(this).hide();
+				//This.switchToolBtn("cursor");
+				var ps = me.$mpFrom.data("p").split(",");
+				var pe = me.$mpTo.data("p").split(",");
+
+				me.$workArea.data("lineEnd", {
+					"x": pe[0],
+					"y": pe[1],
+					"id": me.$lineData[me.$lineOper.data("tid")].to
+				}).css("cursor", "crosshair");
+
+				var line = me.drawLine("GooFlow_tmp_line", [ps[0], ps[1]], [pe[0], pe[1]], true, true);
+				me.$draw.appendChild(line);
+				return false;
+			});
 
 
+			me.$mpTo.on("mousedown", function (e) {
+				$(this).hide();
+				//me.switchToolBtn("cursor");
+				var ps = me.$mpFrom.data("p").split(",");
+				var pe = me.$mpTo.data("p").split(",");
+				
+				me.$workArea.data("lineStart", {
+					"x": ps[0],
+					"y": ps[1],
+					"id": me.$lineData[me.$lineOper.data("tid")].from
+				}).css("cursor", "crosshair");
+
+				var line = me.drawLine("GooFlow_tmp_line", [ps[0], ps[1]], [pe[0], pe[1]], true, true);
+				me.$draw.appendChild(line);
+				return false;
+			});
+		},
 
 
+		//原lineData已经设定好的情况下，只在绘图工作区画一条线的页面元素
+		addLineDom: function (id, lineData) {
+
+			var me = this;
+			//获取开始/结束结点的数据
+			var n1 = me.$nodeData[lineData.from],
+				n2 = me.$nodeData[lineData.to]; 
+
+			if (!n1 || !n2) 
+				return;
+			//开始计算线端点坐标
+			var res;
+
+			if (lineData.type && lineData.type != "sl")
+				res = me.calcPolyPoints(n1, n2, lineData.type, lineData.M);
+			else
+				res = me.calcStartEnd(n1, n2);
+
+			if (!res) return;
+
+			if (lineData.type == "sl")
+				me.$lineDom[id] = me.drawLine(id, res.start, res.end, lineData.marked);
+			else
+				me.$lineDom[id] = me.drawPoly(id, res.start, res.m1, res.m2, res.end, lineData.marked);
+			
+			me.$draw.appendChild(me.$lineDom[id]);
+
+			if (useSVG) {
+
+				me.$lineDom[id].childNodes[1].innerHTML = lineData.name;
+
+				if (lineData.type != "sl") {
+
+					var Min = (res.start[0] > res.end[0] ? res.end[0] : res.start[0]);
+					if (Min > res.m2[0]) Min = res.m2[0];
+					if (Min > res.m1[0]) Min = res.m1[0];
+
+					me.$lineDom[id].childNodes[1].style.left = (res.m2[0] + res.m1[0]) / 2 - Min - me.$lineDom[id].childNodes[1].offsetWidth / 2 + 4;
+					
+					Min = (res.start[1] > res.end[1] ? res.end[1] : res.start[1]);
+					if (Min > res.m2[1]) Min = res.m2[1];
+					if (Min > res.m1[1]) Min = res.m1[1];
+					
+					me.$lineDom[id].childNodes[1].style.top = (res.m2[1] + res.m1[1]) / 2 - Min - me.$lineDom[id].childNodes[1].offsetHeight / 2;
+				}
+				else{
+
+					me.$lineDom[id].childNodes[1].style.left =
+					((res.end[0] - res.start[0]) * (res.end[0] > res.start[0] ? 1 : -1) - me.$lineDom[id].childNodes[1].offsetWidth) / 2 + 4;
+				
+				}
+					
+			}
+		},
+
+		//增加一条线
+		addLine: function (json) {
+
+			var id = GooFlow.getUID('LINE');
+			var me = this;
+
+			//回调函数
+			//if (me.onItemAdd != null && !me.onItemAdd(id, "line", json)) return;
+
+			// if (me.$undoStack && me.$editable) {
+			// 	me.pushOper("delLine", [id]);
+			// }
+
+			if (json.from == json.to) return;
+
+			//获取开始/结束结点的数据
+			var n1 = me.$nodeData[json.from],
+				n2 = me.$nodeData[json.to]; 
+			if (!n1 || !n2) return;
+
+			//避免两个节点间不能有一条以上同向接连线
+			for (var k in me.$lineData) {
+				if ((json.from == me.$lineData[k].from && json.to == me.$lineData[k].to))
+					return;
+			}
+
+
+			//设置$lineData[id]
+			me.$lineData[id] = {};
+
+			if (json.type) {
+				me.$lineData[id].type = json.type;
+				me.$lineData[id].M = json.M;
+			}else {
+				//默认为直线
+				me.$lineData[id].type = "sl";
+			} 
+
+			me.$lineData[id].from = json.from;
+			me.$lineData[id].to = json.to;
+			me.$lineData[id].name = json.name;
+
+			if (json.marked) 
+				me.$lineData[id].marked = json.marked;
+			else 
+				me.$lineData[id].marked = false;
+
+
+			me.addLineDom(id, me.$lineData[id]);
+
+			// if (me.$editable) {
+			// 	me.$lineData[id].alt = true;
+			// 	if (me.$deletedItem[id]) delete me.$deletedItem[id]; //在回退删除操作时,去掉该元素的删除记录
+			// }
+		},
+
+		//变更连线两个端点所连的结点
+		//参数：要变更端点的连线ID，新的开始结点ID、新的结束结点ID；如果开始/结束结点ID是传入null或者""，则表示原端点不变
+		moveLinePoints: function (lineId, newStart, newEnd, noStack) {
+
+			if (newStart == newEnd) return;
+
+			if (!lineId || !this.$lineData[lineId]) return;
+
+			if (newStart == null || newStart == "")
+				newStart = this.$lineData[lineId].from;
+
+			if (newEnd == null || newEnd == "")
+				newEnd = this.$lineData[lineId].to;
+
+			//避免两个节点间不能有一条以上同向接连线
+			for (var k in this.$lineData) {
+				if ((newStart == this.$lineData[k].from && newEnd == this.$lineData[k].to))
+				return;
+			}
+
+			//if (this.onLinePointMove != null && !this.onLinePointMove(id, newStart, newEnd)) return;
+
+			// if (this.$undoStack && !noStack) {
+			// 	var paras = [lineId, this.$lineData[lineId].from, this.$lineData[lineId].to];
+			// 	this.pushOper("moveLinePoints", paras);
+			// }  
+			
+			if (newStart != null && newStart != "") {
+				this.$lineData[lineId].from = newStart;
+			}
+
+			if (newEnd != null && newEnd != "") {
+				this.$lineData[lineId].to = newEnd;
+			}
+
+			//重建转换线
+			this.$draw.removeChild(this.$lineDom[lineId]);
+			this.addLineDom(lineId, this.$lineData[lineId]);
+			
+			// if (this.$editable) {
+			// 	this.$lineData[lineId].alt = true;
+			// }
+		},
 
 		/**
 		 * 绘制一条箭头线，并返回线的DOM
 		 */
 		drawLine: function (id, sp, ep, mark, dash) {
 			var line;
-			if (useSve) {
+			if (useSVG) {
 				line = document.createElementNS(SVG_NS, "g");
 				var hi = document.createElementNS(SVG_NS, "path");
 				var path = document.createElementNS(SVG_NS, "path");
@@ -402,7 +722,7 @@
 		 */
 		drawPoly: function (id, sp, m1, m2, ep, mark) {
 			var poly, strPath;
-			if (useSve) {
+			if (useSVG) {
 				poly = document.createElementNS(SVG_NS, "g");
 				var hi = document.createElementNS(SVG_NS, "path");
 				var path = document.createElementNS(SVG_NS, "path");
