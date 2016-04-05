@@ -5,32 +5,34 @@
 	var SVG_NS = 'http://www.w3.org/2000/svg';
 
 	function uuid(len, radix) {
-	    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-	    var uuid = [], i;
-	    radix = radix || chars.length;
-	 
-	    if (len) {
-	      // Compact form
-	      for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random()*radix];
-	    } else {
-	      // rfc4122, version 4 form
-	      var r; 
-	 
-	      // rfc4122 requires these characters
-	      uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-	      uuid[14] = '4';
-	 
-	      // Fill in random data.  At i==19 set the high bits of clock sequence as
-	      // per rfc4122, sec. 4.1.5
-	      for (i = 0; i < 36; i++) {
-	        if (!uuid[i]) {
-	          r = 0 | Math.random()*16;
-	          uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
-	        }
-	      }
-	    }
-	 
-	    return uuid.join('');
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+		var uuid = [],
+			i;
+		radix = radix || chars.length;
+
+		if (len) {
+			// Compact form
+			for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
+		}
+		else {
+			// rfc4122, version 4 form
+			var r;
+
+			// rfc4122 requires these characters
+			uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+			uuid[14] = '4';
+
+			// Fill in random data.  At i==19 set the high bits of clock sequence as
+			// per rfc4122, sec. 4.1.5
+			for (i = 0; i < 36; i++) {
+				if (!uuid[i]) {
+					r = 0 | Math.random() * 16;
+					uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+				}
+			}
+		}
+
+		return uuid.join('');
 	}
 
 
@@ -70,7 +72,7 @@
 		me.EditEnum = {
 			//选择状态
 			SELECT: 1,
-			
+
 			//连接线状态
 			LINE: 2
 
@@ -151,7 +153,7 @@
 			me.$toolsBox = me.$container.append(me.$tools).find('.J_toolsBox');
 
 			//子控件拖拽时切换到 select 状态
-			me.$toolsBox.on('dragstart', function(){
+			me.$toolsBox.on('dragstart', function () {
 				me._switchEditType(me.EditEnum.SELECT);
 			});
 
@@ -184,19 +186,19 @@
 
 		},
 
-		_initSwitchTools: function(){
+		_initSwitchTools: function () {
 			var me = this,
 				id = GooFlow.getUID('GROUP');
 			var templ = '';
-				templ += '<h4 class="tools-title">工作状态</h4>';
-				templ += '<ul class="tools-group" id="'+id+'">';
-				templ += '<li><div data-switchtype="1" class="tools pointer J_switch J_select active"><span class=""></span><span>选择</span></div></li>';
-				templ += '<li><div data-switchtype="2" class="tools pointer J_switch J_line"><span class=""></span><span>连接线</span></div></li></ul>';
-				me.$toolsBox.append(templ);
-			var $switchGroup =  me.$switchGroup = me.$toolsBox.find('.J_switch');
+			templ += '<h4 class="tools-title">工作状态</h4>';
+			templ += '<ul class="tools-group" id="' + id + '">';
+			templ += '<li><div data-switchtype="1" class="tools pointer J_switch J_select active"><span class=""></span><span>选择</span></div></li>';
+			templ += '<li><div data-switchtype="2" class="tools pointer J_switch J_line"><span class=""></span><span>连接线</span></div></li></ul>';
+			me.$toolsBox.append(templ);
+			var $switchGroup = me.$switchGroup = me.$toolsBox.find('.J_switch');
 
 
-			$switchGroup.on('click',function(){
+			$switchGroup.on('click', function () {
 				var switchType = this.getAttribute('data-switchtype');
 				me._switchEditType(switchType);
 			});
@@ -213,7 +215,7 @@
 			me.$workArea = me.$container.append(me.$work).find('.J_workArea');
 			me._initDraw();
 			me.$textArea = $("<textarea></textarea>");
-			me.$textArea.on('mousedown', function(e){
+			me.$textArea.on('mousedown', function (e) {
 				e.stopPropagation();
 			});
 			me.$workArea.append(me.$textArea);
@@ -221,20 +223,20 @@
 			//绑定双击编辑事件
 			me.$workArea.on("dblclick", ".J_text", function (e) {
 				var $this = $(this),
-					$parentControl =  $this.parents('.control'),
+					$parentControl = $this.parents('.control'),
 					id = $parentControl[0].id,
 					oldTxt = this.innerHTML,
-					t= $parentControl.position();
+					t = $parentControl.position();
 
 				me.$textArea.val(oldTxt).css({
-						display: "block",
-						position: "absolute",
-						height: $this.height(),
-						width: $this.width(),
-						left: t.left,
-						top: t.top,
-						zIndex: 999
-					}).data("id", me.curId).focus();
+					display: "block",
+					position: "absolute",
+					height: $this.height(),
+					width: $this.width(),
+					left: t.left,
+					top: t.top,
+					zIndex: 999
+				}).data("id", me.curId).focus();
 
 				me.$workArea.parent().one("mousedown", function (e) {
 					if (e.button == 2) return false;
@@ -251,15 +253,15 @@
 					var type = ui.draggable.attr('data-type');
 					var offset = me._getToWorkOffset(ui.offset);
 					me.addControl({
-						type:type,
+						type: type,
 						left: offset.left,
 						top: offset.top
 					});
 				}
 			});
 
-			me.$workArea.on('click', function(e){
-				if(me.editType == me.EditEnum.SELECT){
+			me.$workArea.on('click', function (e) {
+				if (me.editType == me.EditEnum.SELECT) {
 					var t = e.target;
 					var n = t.tagName;
 					if (n == "svg" || (n == "DIV" && t.className.indexOf("control") > -1) || n == "LABEL") {
@@ -274,13 +276,13 @@
 			});
 
 			//拖拽停止时。重新划线
-			me.$workArea.on('dragstart','.control', function(event, ui){
+			me.$workArea.on('dragstart', '.control', function (event, ui) {
 				me.focusItem(this.id);
 
 			});
 
 			//拖拽停止时。重新划线
-			me.$workArea.on('dragstop','.control', function(event, ui){
+			me.$workArea.on('dragstop', '.control', function (event, ui) {
 				var thisControl = me.controls[this.id];
 				thisControl.syncUI(ui.offset);
 				me.resetLines(this.id, thisControl);
@@ -288,7 +290,7 @@
 			});
 
 			//改变大小时。重新划线
-			me.$workArea.on('resizestop','.control', function(event, ui){
+			me.$workArea.on('resizestop', '.control', function (event, ui) {
 				var thisControl = me.controls[this.id];
 				thisControl.syncUI();
 				me.resetLines(this.id, thisControl);
@@ -296,7 +298,7 @@
 
 			//点击切换当前控件
 			me.$workArea.on('click', '.control', function (e) {
-				if(!me.isEdit) return;
+				if (!me.isEdit) return;
 				var thisCtl = me.controls[this.id];
 				me.focusItem(thisCtl.id);
 			});
@@ -345,7 +347,7 @@
 					}
 				}
 			});
-			
+
 			//划线或改线时用的绑定
 			me.$workArea.on('mouseup', function (e) {
 
@@ -371,7 +373,7 @@
 
 			//绑定连接线状态时鼠标覆盖/移出事件
 			me.$workArea.on('mouseenter', '.control', function (e) {
-				if(me.editType != me.EditEnum.LINE && !document.getElementById("GooFlow_tmp_line")) return;
+				if (me.editType != me.EditEnum.LINE && !document.getElementById("GooFlow_tmp_line")) return;
 				$(this).addClass("control-mark").addClass("crosshair").css("border-color", me.options.color.mark);
 
 			});
@@ -458,7 +460,7 @@
 			});
 		},
 
-		
+
 
 		//初始化布局 
 		_initLayout: function () {
@@ -533,29 +535,30 @@
 		/**
 		 * 切换工作状态
 		 */
-		_switchEditType: function(type){
+		_switchEditType: function (type) {
 			var me = this;
-			if(!me.isEdit || me.editType == type) return;
+			if (!me.isEdit || me.editType == type) return;
 
 			me.blurItem();
 
-			if(type == me.EditEnum.SELECT){
-				$.each(me.controls,function(){
-					this.$el.draggable( "enable" );
-					this.$el.resizable( "enable" );
-					
+			if (type == me.EditEnum.SELECT) {
+				$.each(me.controls, function () {
+					this.$el.draggable("enable");
+					this.$el.resizable("enable");
+
 				});
-			}else{
-				$.each(me.controls,function(){
-					this.$el.draggable( "disable" );
-					this.$el.resizable( "disable" );
+			}
+			else {
+				$.each(me.controls, function () {
+					this.$el.draggable("disable");
+					this.$el.resizable("disable");
 				});
 			}
 
 			me.editType = type;
 
-			me.$switchGroup.removeClass('active').filter(function() {
-			  return this.getAttribute('data-switchtype') == type;
+			me.$switchGroup.removeClass('active').filter(function () {
+				return this.getAttribute('data-switchtype') == type;
 			}).addClass('active');
 		},
 
@@ -569,7 +572,7 @@
 			var ctl = new GooFlow.Control(obj);
 			ctl.syncUI();
 			me.$workArea.append(ctl.$el);
-			
+
 
 			//加入总控件组
 			me.controls[ctl.id] = ctl;
@@ -594,11 +597,11 @@
 			// 	var paras = [id, me.$nodeData[id]];
 			// 	me.pushOper("addNode", paras);
 			// } 
-		
+
 			me.controls[id].remove();
 			delete me.controls[id];
-			if (me.curId == id){
- 				me.curId = "";
+			if (me.curId == id) {
+				me.curId = "";
 			}
 
 			// if (me.$editable) {
@@ -616,20 +619,21 @@
 			var me = this;
 			if (!me.blurItem() || !id) return;
 
-			if(/CONTROL/.test(id)){
+			if (/CONTROL/.test(id)) {
 				//控件
 				me._switchEditType(me.EditEnum.SELECT);
 				me.controls[id].$el.removeClass("control-mark").removeClass("crosshair").css("border-color", '');
 				me.controls[id].focus();
-				
-			}else{
+
+			}
+			else {
 				//连接线
 				var lineDom = me.lines[id].$el;
 				if (useSVG) {
 					lineDom.childNodes[1].setAttribute("stroke", me.options.color.mark);
 					lineDom.childNodes[1].setAttribute("marker-end", "url(#arrow2)");
 				}
-				if(!me.isEdit) return;
+				if (!me.isEdit) return;
 
 				var x, y, from, to, n;
 				if (useSVG) {
@@ -707,13 +711,14 @@
 		/**
 		 * 取消所有结点/连线被选定的状态
 		 */
-		blurItem: function(){
+		blurItem: function () {
 			var me = this;
-			if(me.curId){
-				if(/CONTROL/.test(me.curId)){
+			if (me.curId) {
+				if (/CONTROL/.test(me.curId)) {
 					//控件
 					me.controls[me.curId].blur();
-				}else{
+				}
+				else {
 					//连接线
 					var line = me.lines[me.curId];
 					if (useSVG) {
@@ -724,7 +729,7 @@
 					}
 
 					me.$lineMove.hide().removeData("type").removeData("tid");
-					
+
 					if (me.isEdit) {
 						me.$lineOper.hide().removeData("tid");
 						me.$mpFrom.hide().removeData("p");
@@ -742,8 +747,8 @@
 		 * 设置结点/连线/分组区域的文字信息
 		 */
 		setName: function (id, name, type) {
-			var oldName,me= this;
-			if (type == "control") { 
+			var oldName, me = this;
+			if (type == "control") {
 				var control = me.controls[id];
 				//如果是控件
 				if (!control || control.name == name) return;
@@ -760,7 +765,7 @@
 				//重画转换线
 				me.resetLines(id, control);
 			}
-			else if (type == "line") { 
+			else if (type == "line") {
 				//如果是线
 				if (!me.lines[id] || me.lines[id].name == name) return;
 				//if (me.onItemRename != null && !me.onItemRename(id, name, "line")) return;
@@ -790,11 +795,11 @@
 
 			//if (data.title) me.setTitle(data.title);
 
-			_.each(data.controls, function(v){
+			_.each(data.controls, function (v) {
 				me.addControl(v);
 			});
 
-			_.each(data.lines, function(v){
+			_.each(data.lines, function (v) {
 				me.addLine(v);
 			});
 
@@ -807,11 +812,11 @@
 		 */
 		getToJSON: function () {
 			var me = this;
-			var controls = _.map(me.controls, function(v){
+			var controls = _.map(me.controls, function (v) {
 				return v.getToJSON();
 			});
-			var lines = _.map(me.lines,function(v){
-				 return _.omit(v, ['$el','marked']);
+			var lines = _.map(me.lines, function (v) {
+				return _.omit(v, ['$el', 'marked']);
 			});
 
 			var json = {
@@ -823,18 +828,13 @@
 
 
 
-
-
-
-
-
 		/**
 		 * 初始化SVG画布
 		 */
 		_initDraw: function () {
 			var me = this;
 			//创建SVG
-			me.$draw = document.createElementNS(SVG_NS, 'svg'); 
+			me.$draw = document.createElementNS(SVG_NS, 'svg');
 			me.$workArea.prepend(me.$draw);
 
 			//创建箭头
@@ -853,15 +853,15 @@
 			if (useSVG) {
 				tmpClk = "g";
 			}
-			else{ 
+			else {
 				tmpClk = "PolyLine";
 			}
 
-			$(me.$draw).on('click', tmpClk, function(e){
+			$(me.$draw).on('click', tmpClk, function (e) {
 				me.focusItem(this.id);
 			});
 
-			$(me.$draw).on('dblclick', tmpClk, function(e){
+			$(me.$draw).on('dblclick', tmpClk, function (e) {
 				var oldTxt, x, y, from, to;
 				if (useSVG) {
 					oldTxt = this.childNodes[2].textContent;
@@ -885,7 +885,7 @@
 
 				me.$textArea.val(oldTxt).css({
 					display: 'block',
-					position:'absolute',
+					position: 'absolute',
 					width: 120,
 					height: 14,
 					left: x,
@@ -898,9 +898,9 @@
 					me.$textArea.val("").removeData("id").hide();
 				});
 			});
-			
+
 		},
-		
+
 		/**
 		 * 获取svg marker （箭头）
 		 */
@@ -927,31 +927,33 @@
 		/**
 		 * 初始化操作折线时的移动框
 		 */
-		_initLineMove: function(){
+		_initLineMove: function () {
 			var me = this;
 
-			me.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>"); 
+			me.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>");
 			me.$workArea.append(me.$lineMove);
 
 			me.$lineMove.draggable({
 				opacity: 0.5,
 				containment: "#J_workArea",
-				start: function(e,ui){
-					me.$lineMove.css('background-color','#333');
-					if(me.$lineMove.data("type") == "lr"){
-						me.$lineMove.draggable( "option", "axis", "x" );
-					}else if(me.$lineMove.data("type") == "tb"){
-						me.$lineMove.draggable( "option", "axis", "y" );
+				start: function (e, ui) {
+					me.$lineMove.css('background-color', '#333');
+					if (me.$lineMove.data("type") == "lr") {
+						me.$lineMove.draggable("option", "axis", "x");
+					}
+					else if (me.$lineMove.data("type") == "tb") {
+						me.$lineMove.draggable("option", "axis", "y");
 					}
 				},
-				stop: function(e,ui){
+				stop: function (e, ui) {
 					me.$lineMove.css({
 						"background-color": "transparent"
 					});
 					var p = me.$lineMove.position();
-					if (me.$lineMove.data("type") == "lr"){
+					if (me.$lineMove.data("type") == "lr") {
 						me.setLineM(me.$lineMove.data("tid"), p.left + 3);
-					}else if (me.$lineMove.data("type") == "tb"){
+					}
+					else if (me.$lineMove.data("type") == "tb") {
 						me.setLineM(me.$lineMove.data("tid"), p.top + 3);
 					}
 
@@ -1260,7 +1262,7 @@
 			me.$draw.appendChild(me.lines[id].$el);
 
 			if (useSVG) {
-				me.lines[id].$el.childNodes[2].textContent = me.lines[id].name;	
+				me.lines[id].$el.childNodes[2].textContent = me.lines[id].name;
 			}
 
 			// if (me.isEdit) {
@@ -1272,18 +1274,18 @@
 		 * 删除转换线
 		 */
 		delLine: function (id) {
-			var me =this;
+			var me = this;
 			if (!me.lines[id]) return;
 			//if (me.onItemDel != null && !me.onItemDel(id, "node")) return;
 			// if (me.$undoStack) {
 			// 	var paras = [id, me.lines[id]];
 			// 	me.pushOper("addLine", paras);
 			// } 
-			
+
 			me.$draw.removeChild(me.lines[id].$el);
 			delete me.lines[id];
 
-			if (me.curId == id){
+			if (me.curId == id) {
 				me.curId = "";
 			}
 
@@ -1343,7 +1345,6 @@
 			// 	this.lines[lineId].alt = true;
 			// }
 		},
-
 
 
 
@@ -1630,8 +1631,8 @@
 
 	}
 
-	GooFlow.getUID = function(ns){
-		return ns + uuid(8,16);
+	GooFlow.getUID = function (ns) {
+		return ns + uuid(8, 16);
 	}
 
 	// GooFlow.getUID = (function () {
@@ -1745,7 +1746,7 @@
 	/**
 	 * 左边操作栏工具对象
 	 */
-	GooFlow.Tools = function (type,options) {
+	GooFlow.Tools = function (type, options) {
 		this.$el = '';
 		this.id = GooFlow.getUID('TOOLS');
 		this.type = type;
@@ -1870,19 +1871,19 @@
 			});
 		},
 
-		getToJSON: function(){
+		getToJSON: function () {
 			var me = this,
-			pick = _.pick(me, _.keys(me)),
-			json = _.omit(pick,['$el','marked','templ']);
+				pick = _.pick(me, _.keys(me)),
+				json = _.omit(pick, ['$el', 'marked', 'templ']);
 			return json;
 		},
 
 		syncUI: function (offset) {
 			var $el = this.$el;
-			if(offset){
+			if (offset) {
 				$el.offset(offset);
 			}
-			var pos = $el.is(':hidden') ? offset : $el.position(); 
+			var pos = $el.is(':hidden') ? offset : $el.position();
 			$.extend(this, pos, {
 				width: $el.width(),
 				height: $el.height()

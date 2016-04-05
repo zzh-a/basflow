@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="./css/basGooFlow.css" type="text/css" >
+    <link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
+    <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
+    <script src="./lib/jqueryUI/jquery-ui.js"></script>
+
+    <style>
+		.swimlane-box{
+			margin: 100px;
+			position: relative;
+		}
+		
+		
+		.swimlaneX-list{
+			position: absolute;
+			width: 100%;
+		}
+
+		.swimlaneY-list{
+			position: absolute;
+			height: 100%;
+			margin: -42px 0 0 42px ;
+		}
+	
+		.swimlaneX{
+			width: 100%;
+			height: 150px;
+			border: 1px solid #F4E4BB;
+			margin-top: -1px;
+			display: table;
+			background: #fff;
+			-moz-user-select: none; 
+			-webkit-user-select: none; 
+			-ms-user-select: none; 
+			user-select: none
+		}
+
+		.swimlaneX .swimlane-title{
+			padding: 10px;
+			width: 20px;
+			border-right: 1px solid #F4E4BB;
+			height: 100%;
+			display: table-cell;
+			vertical-align: middle;
+			color: #666;
+			font-size: 20px;
+			text-align: center;
+			line-height: 25px;
+			overflow: hidden;
+			cursor: move;
+			white-space: inherit;
+			word-break:break-all;
+		}
+
+		.swimlaneY{
+			width: 150px;
+			height: 1200px;
+			border: 1px solid #F4E4BB;
+			-moz-user-select: none; 
+			-webkit-user-select: none; 
+			-ms-user-select: none; 
+			user-select: none;
+			float: left;
+			margin-left: -1px;
+
+		}
+
+		.swimlaneY .swimlane-title{
+			padding: 10px;
+			height: 20px;
+			border-bottom: 1px solid #F4E4BB;
+			color: #666;
+			font-size: 20px;
+			text-align: center;
+			cursor: move;
+		}
+    </style>
+</head>
+	
+<body>	
+
+		<div class="swimlane-box">
+			<!-- <div class="swimlaneX-list">
+				<div class="swimlaneX" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">121</div>
+					<div class="swimlane-content"></div>
+				</div>
+				<div class="swimlaneX" style="height:250px;" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">22</div>
+					<div class="swimlane-content"></div>
+				</div>
+				<div class="swimlaneX" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">123</div>
+					<div class="swimlane-content"></div>
+				</div>
+			</div> -->
+
+
+			<div class="swimlaneY-list">
+				<div class="swimlaneY" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">121</div>
+					<div class="swimlane-content"></div>
+				</div>
+				<div class="swimlaneY" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">22</div>
+					<div class="swimlane-content"></div>
+				</div>
+				<div class="swimlaneY" onselectstart="return false">
+					<div class="swimlane-title J_swimlaneTitle">123</div>
+					<div class="swimlane-content"></div>
+				</div>
+			</div>
+
+		</div>
+		
+
+		<!-- <div class="swimlane-list">
+			<div class="swimlane-x" onselectstart="return false">
+				<div class="swimlane-title J_swimlaneTitle">121</div>
+				<div class="swimlane-content"></div>
+			</div>
+			<div class="swimlane" style="height:250px;" onselectstart="return false">
+				<div class="swimlane-title J_swimlaneTitle">22</div>
+				<div class="swimlane-content"></div>
+			</div>
+			<div class="swimlane" onselectstart="return false">
+				<div class="swimlane-title J_swimlaneTitle">123</div>
+				<div class="swimlane-content"></div>
+			</div>
+		</div> -->
+
+		<script>
+			$(".swimlaneX").resizable({
+				handles: 's',
+				minHeight: 100,
+				maxHeight: 400,
+				stop: function(){
+					console.log('12');
+					$( ".swimlaneX-list" ).sortable( "refreshPositions" );
+				}
+			});
+
+			$(".swimlaneX-list").sortable({
+					axis: 'y',
+					handle: '.J_swimlaneTitle',
+					tolerance: 'pointer',
+					forcePlaceholderSize: true,
+					revert: true,
+					start: function(event, ui){
+						ui.placeholder.height(ui.item.height());
+					}
+			});
+
+
+			$(".swimlaneY").resizable({
+				handles: 'e',
+				minWidth: 100,
+				maxWidth: 400,
+				stop: function(){
+					$( ".swimlaneY-list" ).sortable( "refreshPositions" );
+				}
+			});
+
+			$(".swimlaneY-list").sortable({
+					axis: 'x',
+					handle: '.J_swimlaneTitle',
+					tolerance: 'pointer',
+					forcePlaceholderSize: true,
+					revert: true,
+					start: function(event, ui){
+						ui.placeholder.width(ui.item.width());
+					}
+			});
+		</script>
+</body>
+</html>
