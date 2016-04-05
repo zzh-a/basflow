@@ -95,11 +95,12 @@ html{
 	width: 70%;
 	float: right;
 	overflow-y: scroll;
+	/*background: #efefef;*/
 }
 .GooFlow_workArea{
+	/*background: #fff;*/
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	z-index: 998;
 }
 
 /*操作线相关*/
@@ -217,11 +218,20 @@ html{
 	border: 1px solid #ccc;
 	border-radius: 7px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	cursor: default;
+	cursor: move;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	text-align: center;
+}
+
+.tools-click {
+	cursor: pointer !important;
+}
+
+.tools-click:active{
+	background: url(../img/toolbg2.png) repeat-x;
+	box-shadow: 2px 2px 3px #e3e3e3 inset;
 }
 
 .tools.active{
@@ -310,102 +320,95 @@ html{
 
 
 
-/*-----------------------------------*/
+/*-------------泳道------------------*/
 
 
 
+.swimlane-box{
+	position: relative;
+}
+
+.swimlane-box .cur{
+	z-index: 910;
+	border-color: #8494DA;
+}
+
+.swimlane-box .cur .swimlane-title{
+	border-color: #8494DA;
+}
 
 
-.process{
-	width: 100px;
-	height: 46px;
+.swimlaneX-list{
 	position: absolute;
-	overflow: hidden;
-	/*background:#A5CFEB;*/
-	/*margin: 60px;*/
-}
-
-.process .pl,
-.process .pc,
-.process .pr{
-	float: left;
-}
-
-.process .pl{
-	height: 100%;
-}
-.process .pl .st,
-.process .pl .sd{
-	width: 0;
-    height: 0;
-    border-left: 23px solid transparent; 
-}
-
-.process .pl .st{
-    border-top: 23px solid #A5CFEB;
-}
-.process .pl .sd{
-    border-bottom: 23px solid #A5CFEB;
-}
-
-.process .pc{
-	float: left;
-	width: 54px;
-	height: 100%;
-	background:#A5CFEB;
-}
-
-.process .pr{
-	float: right;
-	width: 0;
-	height: 0;
-	border: 23px solid transparent;
-	border-bottom-width:23px; 
-	border-left-color: #A5CFEB;
-	border-right: none;
-}
-
-.process-start .pl{
-	width: 23px;
-	height: 100%;
-	background: #A5CFEB;
-	border: none;
-}
-
-.process-end .pr{
-	width: 23px;
-	height: 100%;
-	background: #A5CFEB;
-	border: none;
-}
-
-.process .text{
 	width: 100%;
-	height: 100%;
-	display: table;
-	position: absolute;
+	margin-top: 41px;
 }
-.process .text span{
+
+.swimlaneY-list{
+	position: absolute;
+	height: 100%;
+	margin-left: 41px;
+}
+
+.swimlaneX{
+	box-sizing:border-box;
+	width: 100%;
+	height: 150px;
+	border: 1px solid #F4E4BB;
+	margin-top: -1px;
+	display: table;
+	/*background: #fff;*/
+	-moz-user-select: none; 
+	-webkit-user-select: none; 
+	-ms-user-select: none; 
+	user-select: none
+}
+
+.swimlaneX .swimlane-title{
+	box-sizing:border-box;
+	background: #fff;
+	padding: 10px;
+	width: 40px;
+	border-right: 1px solid #F4E4BB;
+	height: 100%;
 	display: table-cell;
 	vertical-align: middle;
+	color: #666;
+	font-size: 20px;
 	text-align: center;
+	line-height: 25px;
+	overflow: hidden;
+	cursor: move;
+	white-space: inherit;
+	word-break:break-all;
+
 }
 
-.bi,
-.wi{
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-top: 23px solid transparent;
-	border-bottom: 23px solid transparent;
-	border-left: 23px solid #A5CFEB;
-	right: -23px;
-}
-.wi{
-	right: auto;
-	border-left-color: #fff;
+.swimlaneY{
+	box-sizing:border-box; 
+	width: 150px;
+	height: 100%;
+	border: 1px solid #F4E4BB;  
+	-moz-user-select: none; 
+	-webkit-user-select: none; 
+	-ms-user-select: none; 
+	user-select: none;
+	float: left;
+	margin-left: -1px;
+
 }
 
+.swimlaneY .swimlane-title{
+	box-sizing:border-box;
+	background: #fff;
+	padding: 10px;
+	height: 40px;
+	border-bottom: 1px solid #F4E4BB;
+	color: #666;
+	font-size: 20px;
+	text-align: center;
+	cursor: move;
+}
 
 
 

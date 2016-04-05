@@ -91,6 +91,9 @@
 		//存储所有生成的连接线
 		me.lines = {};
 
+		//存储所有生成的泳道
+		me.swimlanes = {}
+
 
 		//当前聚焦的控件/线/泳道 ID
 		me.curId = null;
@@ -104,7 +107,8 @@
 				mark: '#ff3300'
 
 			},
-			toolsGroup: null
+			toolsGroup: null,
+			swimlane: ['x','y']
 		}
 		$.extend(me.options, options);
 
@@ -213,6 +217,8 @@
 			var templ = '<div class="GooFlow_work"><div class="GooFlow_workArea J_workArea"></div></div>';
 			me.$work = $(templ);
 			me.$workArea = me.$container.append(me.$work).find('.J_workArea');
+			//初始化泳道
+			me._initSwimlane();
 			me._initDraw();
 			me.$textArea = $("<textarea></textarea>");
 			me.$textArea.on('mousedown', function (e) {
@@ -455,6 +461,7 @@
 				case 46: //删除
 					me.delControl(me.curId, true);
 					me.delLine(me.curId);
+					me.delSwimlane(me.curId);
 					break;
 				}
 			});
@@ -462,18 +469,149 @@
 
 
 
+		_initSwimlane: function(){
+			var me = this,i;
+			if(!me.options.swimlane) return;
+
+			me.swimlaneTempl = doT.template($('#swimlane_templ').text());
+			var $swimlaneBox = me.$swimlaneBox = $('<div class="swimlane-box"></div>');
+			var swimlane = $.isArray(me.options.swimlane) ? me.options.swimlane : me.options.swimlane.split(',');
+
+			//生成泳道area
+			for(i=0;i<swimlane.length; i++){
+				var laneType = swimlane[i].toLowerCase();
+				
+				//横向泳道
+				if(laneType == 'x'){
+					me.$swimlaneX = $('<div class="swimlaneX-list"></div>');
+					me.$swimlaneX.appendTo($swimlaneBox);
+				}
+
+				//纵向泳道
+				if(laneType == 'y'){
+					me.$swimlaneY = $('<div class="swimlaneY-list"></div>');
+					me.$swimlaneY.appendTo($swimlaneBox);
+				}
+			}
+			$swimlaneBox.appendTo(me.$work);
+			var isSwimlaneY = !!me.$swimlaneY,
+				isSwimlaneX = !!me.$swimlaneX;
+
+			if(!isSwimlaneY && !isSwimlaneX || !me.isEdit) return;
+
+			if(isSwimlaneX){
+				me.$swimlaneX.sortable({
+						axis: 'y',
+						handle: '.J_swimlaneTitle',
+						tolerance: 'pointer',
+						forcePlaceholderSize: true,
+						revert: true,
+						start: function(event, ui){
+							ui.placeholder.height(ui.item.height());
+						}
+				});
+			}
+
+			if(isSwimlaneY){
+				me.$swimlaneY.sortable({
+					axis: 'x',
+					handle: '.J_swimlaneTitle',
+					tolerance: 'pointer',
+					forcePlaceholderSize: true,
+					revert: true, 
+					start: function(event, ui){
+						ui.placeholder.width(ui.item.width());
+					}
+				});
+			}
+			
+
+			if(!me.options.haveTools) return;
+
+			//初始化左边栏泳道工具
+			var templ = '';
+			templ += '<h4 class="tools-title">泳道</h4>';
+			templ += '<ul class="tools-group">';
+			if(isSwimlaneX){
+				templ += '<li><div data-lane="x" class="tools tools-click J_laneX"><span class=""></span><span>横向泳道</span></div></li>';
+			}
+
+			if(isSwimlaneY){
+				templ += '<li><div data-lane="y" class="tools tools-click  J_laneY"><span class=""></span><span>纵向泳道</span></div></li>';
+			}
+
+			templ += '</ul>';
+			me.$toolsBox.append(templ);
+
+			if(isSwimlaneX){
+
+				me.$toolsBox.find('.J_laneX').on('click', function(){
+					me.addSwimlane('x');
+				});
+			}
+
+			if(isSwimlaneY){
+				me.$toolsBox.find('.J_laneY').on('click', function(){
+					me.addSwimlane('y');
+				});
+			}
+
+
+			//获取焦点
+			me.$swimlaneBox.on('click', '.swimlaneX,.swimlaneY', function(e){
+				me.focusItem(this.id);
+			});
+
+
+		},
+
 		//初始化布局 
 		_initLayout: function () {
 			var me = this;
 			$(window).on('resize', function () {
 				var height = me.options.height || $(window).height(),
-					workHeight = me.options.haveHead ? height - me.$head.height() : height;
+					workHeight = me.options.haveHead ? height - me.$head.height() : height,
+					workWidth = me.$work.width();
 				me.$tools.css('height', workHeight);
 				me.$work.css('height', workHeight);
+
+				var workAreaTop = 0,
+					workAreaLeft = 0;
+
+				if(me.$swimlaneBox){
+					me.$swimlaneBox.css({
+						height: workHeight * 3
+					});
+				}
+
+				if(me.$swimlaneX){
+					workAreaLeft = 40;
+					var laneXtop = me.$swimlaneY ? 41 : 0;
+					me.$swimlaneX.css({
+						width: '100%',
+						height: workHeight * 3,
+						marginTop: laneXtop
+					});
+				}
+
+
+				if(me.$swimlaneY){
+					workAreaTop = 40;
+					var laneYleft = me.$swimlaneX ? 42 : 0;
+					me.$swimlaneY.css({
+						width: workWidth - laneYleft - 20,
+						height: workHeight * 3,
+						marginLeft: laneYleft
+					});
+				}
+
+
 				//工作控件高度。默认为容器高度的三倍
 				me.$workArea.css({
-					width: '100%',
-					height: workHeight * 3
+					width: workWidth - workAreaLeft - 20,
+					height: workHeight * 3,
+					top: workAreaTop,
+					left: workAreaLeft
 				});
 				$(me.$draw).css({
 					width: '100%',
@@ -562,6 +700,83 @@
 			}).addClass('active');
 		},
 
+
+		/**
+		 * 向工作空间中添加泳道
+		 */
+		addSwimlane: function(laneType, obj){
+			var me = this, laneType = laneType.toLowerCase()
+			var obj = $.extend({
+				name: '泳道',
+				type: laneType.toUpperCase(),
+				height: 150,
+				width: 150
+			}, obj);
+
+			obj.id = obj.id || GooFlow.getUID('SWIMLANE');
+
+			me.swimlanes[obj.id] = obj;
+			
+			if(laneType == 'x'){
+				if(!me.$swimlaneX) return;
+
+				window.$swimlaneX = me.$swimlaneX;
+				var $item = $(me.swimlaneTempl(obj));
+				me.$swimlaneX.append($item);
+				
+				$item.css({
+					height: obj.height
+				});
+
+				$item.resizable({
+					handles: 's',
+					minHeight: 100,
+					maxHeight: 400,
+					stop: function(e,ui){
+						var id = ui.element.attr('id');
+						me.swimlanes[id].height = ui.size.height;
+						//me.$swimlanesX.sortable( "refreshPositions" );
+					}
+				});
+				$item = null;
+			}
+
+
+			if(laneType == 'y'){
+				if(!me.$swimlaneY) return;
+
+				window.$swimlaneY = me.$swimlaneY;
+				var $item = $(me.swimlaneTempl(obj));
+				me.$swimlaneY.append($item);
+				
+				$item.css({
+					width: obj.width
+				});
+
+				$item.resizable({
+					handles: 'e',
+					minWidth: 100,
+					maxWidth: 400,
+					stop: function(e,ui){
+						var id = ui.element.attr('id');
+						me.swimlanes[id].width = ui.size.width;
+						//me.$swimlanesY.sortable( "refreshPositions" );
+					}
+				});
+				$item = null;
+			}
+		},
+
+		/**
+		 * 删除工作空间中泳道
+		 */
+		delSwimlane: function(id){
+			var me = this;
+			if(!me.swimlanes[id]) return;
+			$('#'+id).remove();
+			delete me.swimlanes[id];
+		},
+
 		/**
 		 * 向工作空间中添加控件
 		 * @param {String} 控件类型
@@ -626,7 +841,7 @@
 				me.controls[id].focus();
 
 			}
-			else {
+			else if(/LINE/.test(id)) {
 				//连接线
 				var lineDom = me.lines[id].$el;
 				if (useSVG) {
@@ -702,7 +917,10 @@
 
 				me.$draw.appendChild(lineDom);
 
-			}
+			} else {	
+				//泳道
+				$('#'+id).addClass('cur');
+			}	
 
 			me.curId = id;
 		},
@@ -718,7 +936,7 @@
 					//控件
 					me.controls[me.curId].blur();
 				}
-				else {
+				else if(/LINE/.test(me.curId)) {
 					//连接线
 					var line = me.lines[me.curId];
 					if (useSVG) {
@@ -736,6 +954,9 @@
 						me.$mpTo.hide().removeData("p");
 					}
 
+				}else{
+					//泳道
+					$('#'+me.curId).removeClass('cur');
 				}
 			}
 			me.curId = "";
@@ -803,6 +1024,17 @@
 				me.addLine(v);
 			});
 
+
+			var swimlanes = _.groupBy(data.swimlanes, 'type');
+
+			_.each(swimlanes['X'], function (v) {
+				me.addSwimlane('x',v);
+			});
+
+			_.each(swimlanes['Y'], function (v) {
+				me.addSwimlane('y',v);
+			});
+
 			me.isEdit = t;
 			//me.$deletedItem = {};
 		},
@@ -815,13 +1047,31 @@
 			var controls = _.map(me.controls, function (v) {
 				return v.getToJSON();
 			});
+
+
 			var lines = _.map(me.lines, function (v) {
 				return _.omit(v, ['$el', 'marked']);
 			});
 
+			var swimlanes = [],i;
+			if(me.$swimlaneX){
+				var swimlaneX = me.$swimlaneX.sortable( "toArray" );
+				for(i=0; i< swimlaneX.length; i ++){
+					swimlanes.push(me.swimlanes[swimlaneX[i]]);
+				}
+			}
+
+			if(me.$swimlaneY){
+				var swimlaneY = me.$swimlaneY.sortable( "toArray" );
+				for(i=0; i< swimlaneY.length; i ++){
+					swimlanes.push(me.swimlanes[swimlaneY[i]]);
+				}
+			}
+
 			var json = {
 				controls: controls,
-				lines: lines
+				lines: lines,
+				swimlanes: swimlanes
 			};
 			return json;
 		},
@@ -1796,7 +2046,8 @@
 						left: 20,
 						top: 0
 					},
-					containment: "document"
+					containment: "document",
+					zIndex: 1000
 				});
 			}
 		}
@@ -1855,7 +2106,7 @@
 				cursor: 'move',
 				opacity: 0.5,
 				appendTo: 'body',
-				containment: "#J_workArea"
+				containment: ".J_workArea"
 			});
 		},
 
