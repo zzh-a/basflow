@@ -20,11 +20,18 @@
     <script src="./js/GooFlowPro.js"></script>
   </head>
   <body>
-    <div id="basGooFlow"></div>
+    <div id="basGooFlow" ></div>
 
     <!-- template -->
     <script id="attr_templ" type="text/x-dot-template">
-        
+        <table class="attr-table">
+            {{for(var k in it.attrList) { }}
+                <tr>
+                  <td>{{= k }}</td>
+                  <td><input type="text" readonly="true" class="attr-table-inp"  value="{{= it.attrList[k] }}" /></td>
+                </tr>
+            {{ } }}
+        </table>
     </script>
 
     <script id="swimlane_templ" type="text/x-dot-template">

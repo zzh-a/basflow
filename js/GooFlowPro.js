@@ -84,6 +84,8 @@
 		//默认为选择状态
 		me.editType = me.EditEnum.SELECT;
 
+		//流程图名称
+		me.flowName = "流程图";
 
 		//存储所有生成的控件
 		me.controls = {};
@@ -108,7 +110,7 @@
 
 			},
 			toolsGroup: null,
-			swimlane: ['x','y']
+			swimlane: ['x', 'y']
 		}
 		$.extend(me.options, options);
 
@@ -152,13 +154,15 @@
 		 */
 		_initTools: function () {
 			var me = this;
-			var templ = me.options.toolsTempl || '<div class="GooFlow_tool"><ul class="nav nav-tabs J_navTabs"><li data-plan="control" class="active"><a href="javascript:;">控件</a></li><li data-plan="attr"><a href="javascript:;">属性</a></li></ul><ul class="nav nav-cnts J_navCnts"><li class="J_toolsBox"></li><li style="display:none;"></li></ul></div>';
+			var templ = me.options.toolsTempl || '<div class="GooFlow_tool"><ul class="nav nav-tabs J_navTabs"><li data-plan="control" class="active"><a href="javascript:;">控件</a></li><li data-plan="attr"><a href="javascript:;">属性</a></li></ul><ul class="nav nav-cnts J_navCnts"><li class="J_toolsBox"></li><li class="J_attrBox" style="display:none;"></li></ul></div>';
 			me.$tools = $(templ);
 			me.$toolsBox = me.$container.append(me.$tools).find('.J_toolsBox');
+			me.$attrBox = me.$tools.find('.J_attrBox');
 			me.$navTabs = me.$tools.find('.J_navTabs');
 			me.$navCnts = me.$tools.find('.J_navCnts');
+			me.attrTempl = doT.template($('#attr_templ').text());
 
-			me.$navTabs.on('click', 'li', function(){
+			me.$navTabs.on('click', 'li', function () {
 				var plan = this.getAttribute('data-plan');
 				me._switchPlan(plan);
 			});
@@ -201,12 +205,21 @@
 		 * 切换面板
 		 * @param {String} 面板类型 control:0   attr:1
 		 */
-		_switchPlan: function(type){ 
+		_switchPlan: function (type, attrList) {
 			var me = this,
 				index = type == 'attr' ? 1 : 0;
 
 			me.$navTabs.children().removeClass('active').eq(index).addClass('active');
 			me.$navCnts.children().hide().eq(index).show();
+
+			if (type == 'attr') {
+				var attrList = attrList || {
+					name: me.flowName
+				}
+				me.$attrBox.empty().append(me.attrTempl({
+					attrList: attrList
+				}));
+			}
 		},
 
 		/**
@@ -248,17 +261,17 @@
 			});
 			me.$work.append(me.$textArea);
 
-			me.$textArea.on('blur', function(e){
+			me.$textArea.on('blur', function (e) {
 				var dom = me.$textArea.data('dom'),
 					attrName = me.$textArea.data('attrName'),
 					type = me.$textArea.data('type');
-				if(!dom) return;
+				if (!dom) return;
 
 				me.setAttr(me.curId, attrName, this.value, type);
 
 				dom.innerHTML = this.value;
 
-				me.$textArea.removeData(['dom','attrName','type']).hide();
+				me.$textArea.removeData(['dom', 'attrName', 'type']).hide();
 			});
 
 			//绑定双击编辑事件
@@ -268,14 +281,14 @@
 					id = $parentControl[0].id,
 					attrName = this.getAttribute('data-attrName') || 'name',
 					oldTxt = this.innerHTML,
-					t = me._getToWorkOffset($this.offset(),me.$work);
+					t = me._getToWorkOffset($this.offset(), me.$work);
 
 				me.$textArea.val(oldTxt).css({
 					display: "block",
 					position: "absolute",
 					height: $this.height() - 2,
-					width: $this.width()  - 2,
-					left: t.left ,
+					width: $this.width() - 2,
+					left: t.left,
 					top: t.top,
 					zIndex: 999
 				}).data({
@@ -310,6 +323,7 @@
 						}
 						else {
 							me.blurItem();
+							me._switchPlan('control');
 						}
 					}
 				}
@@ -503,26 +517,51 @@
 
 
 
-		_initSwimlane: function(){
-			var me = this,i;
-			if(!me.options.swimlane) return;
+		_initSwimlane: function () {
+			var me = this,
+				i;
+			if (!me.options.swimlane) return;
 
 			me.swimlaneTempl = doT.template($('#swimlane_templ').text());
 			var $swimlaneBox = me.$swimlaneBox = $('<div class="swimlane-box"></div>');
-			var swimlane = $.isArray(me.options.swimlane) ? me.options.swimlane : me.options.swimlane.split(',');
 
+			$swimlaneBox.on('dblclick', '.J_swimlaneTitle', function () {
+				var $this = $(this),
+					$parent = $this.parent(),
+					id = $parent[0].id,
+					attrName = this.getAttribute('data-attrName') || 'name',
+					oldTxt = this.innerHTML,
+					t = me._getToWorkOffset($this.offset(), me.$work);
+
+				me.$textArea.val(oldTxt).css({
+					display: "block",
+					position: "absolute",
+					height: this.offsetHeight - 2,
+					width: this.offsetWidth - 2,
+					left: t.left,
+					top: t.top,
+					zIndex: 999
+				}).data({
+					dom: this,
+					attrName: attrName,
+					type: 'swimlane'
+				}).focus();
+			});
+
+
+			var swimlane = $.isArray(me.options.swimlane) ? me.options.swimlane : me.options.swimlane.split(',');
 			//生成泳道area
-			for(i=0;i<swimlane.length; i++){
+			for (i = 0; i < swimlane.length; i++) {
 				var laneType = swimlane[i].toLowerCase();
-				
+
 				//横向泳道
-				if(laneType == 'x'){
+				if (laneType == 'x') {
 					me.$swimlaneX = $('<div class="swimlaneX-list"></div>');
 					me.$swimlaneX.appendTo($swimlaneBox);
 				}
 
 				//纵向泳道
-				if(laneType == 'y'){
+				if (laneType == 'y') {
 					me.$swimlaneY = $('<div class="swimlaneY-list"></div>');
 					me.$swimlaneY.appendTo($swimlaneBox);
 				}
@@ -531,72 +570,72 @@
 			var isSwimlaneY = !!me.$swimlaneY,
 				isSwimlaneX = !!me.$swimlaneX;
 
-			if(!isSwimlaneY && !isSwimlaneX || !me.isEdit) return;
+			if (!isSwimlaneY && !isSwimlaneX || !me.isEdit) return;
 
-			if(isSwimlaneX){
+			if (isSwimlaneX) {
 				me.$swimlaneX.sortable({
-						axis: 'y',
-						handle: '.J_swimlaneTitle',
-						tolerance: 'pointer',
-						revert: true,
-						start: function(event, ui){
-							ui.placeholder.height(ui.item.height());
-							//me.$swimlaneX.sortable( "refreshPositions" );
-						},
-						update: function(){
-							//a.a = 1;
-							//return false;
-						}
+					axis: 'y',
+					handle: '.J_swimlaneTitle',
+					tolerance: 'pointer',
+					revert: true,
+					start: function (event, ui) {
+						ui.placeholder.height(ui.item.height());
+						//me.$swimlaneX.sortable( "refreshPositions" );
+					},
+					update: function () {
+						//a.a = 1;
+						//return false;
+					}
 				});
 			}
 
-			if(isSwimlaneY){
+			if (isSwimlaneY) {
 				me.$swimlaneY.sortable({
 					axis: 'x',
 					handle: '.J_swimlaneTitle',
 					tolerance: 'pointer',
-					revert: true, 
-					start: function(event, ui){
+					revert: true,
+					start: function (event, ui) {
 						ui.placeholder.width(ui.item.width());
 						//me.$swimlaneX.sortable( "refreshPositions" );
 					}
 				});
 			}
-			
 
-			if(!me.options.haveTools) return;
+
+			if (!me.options.haveTools) return;
 
 			//初始化左边栏泳道工具
 			var templ = '';
 			templ += '<h4 class="tools-title">泳道</h4>';
 			templ += '<ul class="tools-group">';
-			if(isSwimlaneX){
+			if (isSwimlaneX) {
 				templ += '<li><div data-lane="x" class="tools tools-click J_laneX"><span class=""></span><span>横向泳道</span></div></li>';
 			}
 
-			if(isSwimlaneY){
+			if (isSwimlaneY) {
 				templ += '<li><div data-lane="y" class="tools tools-click  J_laneY"><span class=""></span><span>纵向泳道</span></div></li>';
 			}
 
 			templ += '</ul>';
 			me.$toolsBox.append(templ);
 
-			if(isSwimlaneX){
+			if (isSwimlaneX) {
 
-				me.$toolsBox.find('.J_laneX').on('click', function(){
+				me.$toolsBox.find('.J_laneX').on('click', function () {
 					me.addSwimlane('x');
 				});
 			}
 
-			if(isSwimlaneY){
-				me.$toolsBox.find('.J_laneY').on('click', function(){
+			if (isSwimlaneY) {
+				me.$toolsBox.find('.J_laneY').on('click', function () {
 					me.addSwimlane('y');
 				});
 			}
 
 
 			//获取焦点
-			me.$swimlaneBox.on('click', '.swimlaneX,.swimlaneY', function(e){
+			me.$swimlaneBox.on('click', '.swimlaneX,.swimlaneY', function (e) {
 				me.focusItem(this.id);
 			});
 
@@ -613,16 +652,20 @@
 				me.$tools.css('height', workHeight);
 				me.$work.css('height', workHeight);
 
+				me.$navCnts.css({
+					'height': workHeight - me.$navTabs.height()
+				});
+
 				var workAreaTop = 0,
 					workAreaLeft = 0;
 
-				if(me.$swimlaneBox){
+				if (me.$swimlaneBox) {
 					me.$swimlaneBox.css({
 						height: workHeight * 3
 					});
 				}
 
-				if(me.$swimlaneX){
+				if (me.$swimlaneX) {
 					workAreaLeft = 40;
 					var laneXtop = me.$swimlaneY ? 41 : 0;
 					me.$swimlaneX.css({
@@ -633,7 +676,7 @@
 				}
 
 
-				if(me.$swimlaneY){
+				if (me.$swimlaneY) {
 					workAreaTop = 40;
 					var laneYleft = me.$swimlaneX ? 42 : 0;
 					me.$swimlaneY.css({
@@ -692,14 +735,14 @@
 		 * @param  {Object} 如果为空则取鼠标距离
 		 * @return {Object}
 		 */
-		_getToWorkOffset: function (offset,wk) {
+		_getToWorkOffset: function (offset, wk) {
 			if (offset.pageX) {
 				offset = {
 					left: offset.pageX,
 					top: offset.pageY
 				}
 			}
-			var $wk = wk ||  this.$workArea,
+			var $wk = wk || this.$workArea,
 				workOffset = $wk.offset(),
 				sT = $wk.scrollTop(),
 				sL = $wk.scrollLeft();
@@ -744,8 +787,9 @@
 		/**
 		 * 向工作空间中添加泳道
 		 */
-		addSwimlane: function(laneType, obj){
-			var me = this, laneType = laneType.toLowerCase()
+		addSwimlane: function (laneType, obj) {
+			var me = this,
+				laneType = laneType.toLowerCase()
 			var obj = $.extend({
 				name: '泳道',
 				type: laneType.toUpperCase(),
@@ -756,14 +800,14 @@
 			obj.id = obj.id || GooFlow.getUID('SWIMLANE');
 
 			me.swimlanes[obj.id] = obj;
-			
-			if(laneType == 'x'){
-				if(!me.$swimlaneX) return;
+
+			if (laneType == 'x') {
+				if (!me.$swimlaneX) return;
 
 				window.$swimlaneX = me.$swimlaneX;
 				var $item = $(me.swimlaneTempl(obj));
 				me.$swimlaneX.append($item);
-				
+
 				$item.css({
 					height: obj.height
 				});
@@ -772,7 +816,7 @@
 					handles: 's',
 					minHeight: 100,
 					maxHeight: 400,
-					stop: function(e,ui){
+					stop: function (e, ui) {
 						var id = ui.element.attr('id');
 						me.swimlanes[id].height = ui.size.height;
 						//me.$swimlanesX.sortable( "refreshPositions" );
@@ -782,13 +826,13 @@
 			}
 
 
-			if(laneType == 'y'){
-				if(!me.$swimlaneY) return;
+			if (laneType == 'y') {
+				if (!me.$swimlaneY) return;
 
 				window.$swimlaneY = me.$swimlaneY;
 				var $item = $(me.swimlaneTempl(obj));
 				me.$swimlaneY.append($item);
-				
+
 				$item.css({
 					width: obj.width
 				});
@@ -797,7 +841,7 @@
 					handles: 'e',
 					minWidth: 100,
 					maxWidth: 400,
-					stop: function(e,ui){
+					stop: function (e, ui) {
 						var id = ui.element.attr('id');
 						me.swimlanes[id].width = ui.size.width;
 						//me.$swimlanesY.sortable( "refreshPositions" );
@@ -810,11 +854,12 @@
 		/**
 		 * 删除工作空间中泳道
 		 */
-		delSwimlane: function(id){
+		delSwimlane: function (id) {
 			var me = this;
-			if(!me.swimlanes[id]) return;
-			$('#'+id).remove();
+			if (!me.swimlanes[id]) return;
+			$('#' + id).remove();
 			delete me.swimlanes[id];
+			me._switchPlan('control');
 		},
 
 		/**
@@ -858,7 +903,7 @@
 			if (me.curId == id) {
 				me.curId = "";
 			}
-
+			me._switchPlan('control');
 			// if (me.$editable) {
 			// 	//在回退新增操作时,如果节点ID以this.$id+"_node_"开头,则表示为本次编辑时新加入的节点,这些节点的删除不用加入到$deletedItem中
 			// 	if (id.indexOf(this.$id + "_node_") < 0)
@@ -874,14 +919,18 @@
 			var me = this;
 			if (!me.blurItem() || !id) return;
 
+			//属性列表
+			var attrList = null;
+
 			if (/CONTROL/.test(id)) {
+				attrList = me.controls[id];
 				//控件
 				me._switchEditType(me.EditEnum.SELECT);
 				me.controls[id].$el.removeClass("control-mark").removeClass("crosshair").css("border-color", '');
 				me.controls[id].focus();
-
 			}
-			else if(/LINE/.test(id)) {
+			else if (/LINE/.test(id)) {
+				attrList = me.lines[id];
 				//连接线
 				var lineDom = me.lines[id].$el;
 				if (useSVG) {
@@ -957,11 +1006,17 @@
 
 				me.$draw.appendChild(lineDom);
 
-			} else {	
+			}
+			else {
+				attrList = me.swimlanes[id];
 				//泳道
-				$('#'+id).addClass('cur');
-			}	
+				$('#' + id).addClass('cur');
+			}
 
+			var pick = _.pick(attrList, _.keys(attrList));
+			attrList = _.omit(pick, ['$el', 'marked', 'templ', 'drag', 'resize']);
+
+			me._switchPlan('attr', attrList);
 			me.curId = id;
 		},
 
@@ -976,7 +1031,7 @@
 					//控件
 					me.controls[me.curId].blur();
 				}
-				else if(/LINE/.test(me.curId)) {
+				else if (/LINE/.test(me.curId)) {
 					//连接线
 					var line = me.lines[me.curId];
 					if (useSVG) {
@@ -994,9 +1049,10 @@
 						me.$mpTo.hide().removeData("p");
 					}
 
-				}else{
+				}
+				else {
 					//泳道
-					$('#'+me.curId).removeClass('cur');
+					$('#' + me.curId).removeClass('cur');
 				}
 			}
 			me.curId = "";
@@ -1011,7 +1067,7 @@
 		 * @param {String} val  值
 		 * @param {String} type 控件类型
 		 */
-		setAttr: function(id,attr,val,type){
+		setAttr: function (id, attr, val, type) {
 			var me = this;
 			if (type == "control") {
 				var control = me.controls[id];
@@ -1028,6 +1084,14 @@
 				// }
 				//重画转换线
 				me.resetLines(id, control);
+			}
+
+			if (type == "swimlane") {
+				var swimlane = me.swimlanes[id];
+				//如果是泳道
+				if (!swimlane || swimlane[attr] == val) return;
+				var oldVal = swimlane[attr];
+				swimlane[attr] = val;
 			}
 		},
 
@@ -1095,13 +1159,15 @@
 			var swimlanes = _.groupBy(data.swimlanes, 'type');
 
 			_.each(swimlanes['X'], function (v) {
-				me.addSwimlane('x',v);
+				me.addSwimlane('x', v);
 			});
 
 			_.each(swimlanes['Y'], function (v) {
-				me.addSwimlane('y',v);
+				me.addSwimlane('y', v);
 			});
 
+			me.blurItem();
+			me._switchPlan('control');
 			me.isEdit = t;
 			//me.$deletedItem = {};
 		},
@@ -1120,17 +1186,18 @@
 				return _.omit(v, ['$el', 'marked']);
 			});
 
-			var swimlanes = [],i;
-			if(me.$swimlaneX){
-				var swimlaneX = me.$swimlaneX.sortable( "toArray" );
-				for(i=0; i< swimlaneX.length; i ++){
+			var swimlanes = [],
+				i;
+			if (me.$swimlaneX) {
+				var swimlaneX = me.$swimlaneX.sortable("toArray");
+				for (i = 0; i < swimlaneX.length; i++) {
 					swimlanes.push(me.swimlanes[swimlaneX[i]]);
 				}
 			}
 
-			if(me.$swimlaneY){
-				var swimlaneY = me.$swimlaneY.sortable( "toArray" );
-				for(i=0; i< swimlaneY.length; i ++){
+			if (me.$swimlaneY) {
+				var swimlaneY = me.$swimlaneY.sortable("toArray");
+				for (i = 0; i < swimlaneY.length; i++) {
 					swimlanes.push(me.swimlanes[swimlaneY[i]]);
 				}
 			}
@@ -1205,8 +1272,8 @@
 					position: 'absolute',
 					width: 120,
 					height: 14,
-					left: x,
-					top: y
+					left: x + (me.$swimlaneY ? 40 : 0),
+					top: y + (me.$swimlaneX ? 40 : 0)
 				}).data("id", me.curId).focus();
 
 				me.$workArea.parent().one("mousedown", function (e) {

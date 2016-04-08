@@ -184,6 +184,10 @@ html{
 
 .nav-cnts{
 	padding: 0 15px;
+	overflow-y: auto;
+}
+.nav-cnts > li{
+	padding-bottom: 40px;
 }
 
 
@@ -340,10 +344,19 @@ html{
 }
 
 
+.attr-table{
+	margin-top: 20px;
+	color: #666;
+}
+.attr-table td{
+	padding: 5px 10px;
+} 
 
-
-
-
+.attr-table-inp{
+	border: 1px solid  #efd586;
+	color: #666;
+	padding: 5px 10px;
+}
 
 
 /*-------------泳道------------------*/
