@@ -152,9 +152,16 @@
 		 */
 		_initTools: function () {
 			var me = this;
-			var templ = me.options.toolsTempl || '<div class="GooFlow_tool"><ul class="nav nav-tabs"><li class="active"><a href="javascript:;">控件</a></li><li><a href="javascript:;">属性</a></li></ul><ul class="nav nav-cnts"><li class="J_toolsBox"></li><li style="display:none;"></li></ul></div>';
+			var templ = me.options.toolsTempl || '<div class="GooFlow_tool"><ul class="nav nav-tabs J_navTabs"><li data-plan="control" class="active"><a href="javascript:;">控件</a></li><li data-plan="attr"><a href="javascript:;">属性</a></li></ul><ul class="nav nav-cnts J_navCnts"><li class="J_toolsBox"></li><li style="display:none;"></li></ul></div>';
 			me.$tools = $(templ);
 			me.$toolsBox = me.$container.append(me.$tools).find('.J_toolsBox');
+			me.$navTabs = me.$tools.find('.J_navTabs');
+			me.$navCnts = me.$tools.find('.J_navCnts');
+
+			me.$navTabs.on('click', 'li', function(){
+				var plan = this.getAttribute('data-plan');
+				me._switchPlan(plan);
+			});
 
 			//子控件拖拽时切换到 select 状态
 			me.$toolsBox.on('dragstart', function () {
@@ -190,6 +197,21 @@
 
 		},
 
+		/**
+		 * 切换面板
+		 * @param {String} 面板类型 control:0   attr:1
+		 */
+		_switchPlan: function(type){ 
+			var me = this,
+				index = type == 'attr' ? 1 : 0;
+
+			me.$navTabs.children().removeClass('active').eq(index).addClass('active');
+			me.$navCnts.children().hide().eq(index).show();
+		},
+
+		/**
+		 * 切换工作状态
+		 */
 		_initSwitchTools: function () {
 			var me = this,
 				id = GooFlow.getUID('GROUP');
@@ -220,35 +242,47 @@
 			//初始化泳道
 			me._initSwimlane();
 			me._initDraw();
-			me.$textArea = $("<textarea></textarea>");
+			me.$textArea = $("<textarea style='display:none;'></textarea>");
 			me.$textArea.on('mousedown', function (e) {
 				e.stopPropagation();
 			});
-			me.$workArea.append(me.$textArea);
+			me.$work.append(me.$textArea);
+
+			me.$textArea.on('blur', function(e){
+				var dom = me.$textArea.data('dom'),
+					attrName = me.$textArea.data('attrName'),
+					type = me.$textArea.data('type');
+				if(!dom) return;
+
+				me.setAttr(me.curId, attrName, this.value, type);
+
+				dom.innerHTML = this.value;
+
+				me.$textArea.removeData(['dom','attrName','type']).hide();
+			});
 
 			//绑定双击编辑事件
-			me.$workArea.on("dblclick", ".J_text", function (e) {
+			me.$workArea.on("dblclick", ".J_editAttr", function (e) {
 				var $this = $(this),
 					$parentControl = $this.parents('.control'),
 					id = $parentControl[0].id,
+					attrName = this.getAttribute('data-attrName') || 'name',
 					oldTxt = this.innerHTML,
-					t = $parentControl.position();
+					t = me._getToWorkOffset($this.offset(),me.$work);
 
 				me.$textArea.val(oldTxt).css({
 					display: "block",
 					position: "absolute",
-					height: $this.height(),
-					width: $this.width(),
-					left: t.left,
+					height: $this.height() - 2,
+					width: $this.width()  - 2,
+					left: t.left ,
 					top: t.top,
 					zIndex: 999
-				}).data("id", me.curId).focus();
-
-				me.$workArea.parent().one("mousedown", function (e) {
-					if (e.button == 2) return false;
-					me.setName(me.$textArea.data("id"), me.$textArea.val(), "control");
-					me.$textArea.val("").removeData("id").hide();
-				});
+				}).data({
+					dom: this,
+					attrName: attrName,
+					type: 'control'
+				}).focus();
 			});
 
 			//接收拖拽生成的对象
@@ -504,10 +538,14 @@
 						axis: 'y',
 						handle: '.J_swimlaneTitle',
 						tolerance: 'pointer',
-						forcePlaceholderSize: true,
 						revert: true,
 						start: function(event, ui){
 							ui.placeholder.height(ui.item.height());
+							//me.$swimlaneX.sortable( "refreshPositions" );
+						},
+						update: function(){
+							//a.a = 1;
+							//return false;
 						}
 				});
 			}
@@ -517,10 +555,10 @@
 					axis: 'x',
 					handle: '.J_swimlaneTitle',
 					tolerance: 'pointer',
-					forcePlaceholderSize: true,
 					revert: true, 
 					start: function(event, ui){
 						ui.placeholder.width(ui.item.width());
+						//me.$swimlaneX.sortable( "refreshPositions" );
 					}
 				});
 			}
@@ -654,19 +692,21 @@
 		 * @param  {Object} 如果为空则取鼠标距离
 		 * @return {Object}
 		 */
-		_getToWorkOffset: function (offset) {
+		_getToWorkOffset: function (offset,wk) {
 			if (offset.pageX) {
 				offset = {
 					left: offset.pageX,
 					top: offset.pageY
 				}
 			}
-			var $wk = this.$workArea,
-				workOffset = $wk.offset();
+			var $wk = wk ||  this.$workArea,
+				workOffset = $wk.offset(),
+				sT = $wk.scrollTop(),
+				sL = $wk.scrollLeft();
 
 			return {
-				left: offset.left - workOffset.left,
-				top: offset.top - workOffset.top
+				left: offset.left - workOffset.left + sL,
+				top: offset.top - workOffset.top + sT
 			}
 		},
 
@@ -963,6 +1003,33 @@
 			return true;
 		},
 
+
+		/**
+		 * 设置结点/连线/永道 属性值
+		 * @param {String} id   控件id
+		 * @param {String} attr 属性
+		 * @param {String} val  值
+		 * @param {String} type 控件类型
+		 */
+		setAttr: function(id,attr,val,type){
+			var me = this;
+			if (type == "control") {
+				var control = me.controls[id];
+				//如果是控件
+				if (!control || control[attr] == val) return;
+
+				//if (me.onItemRename != null && !me.onItemRename(id, name, "node")) return;
+				var oldVal = control[attr];
+				control[attr] = val;
+				control.syncUI();
+
+				// if (me.isEdit) {
+				// 	control.alt = true;
+				// }
+				//重画转换线
+				me.resetLines(id, control);
+			}
+		},
 
 		/**
 		 * 设置结点/连线/分组区域的文字信息
@@ -1908,15 +1975,15 @@
 			name: '标签',
 			drag: true,
 			resize: true,
-			width: '100px',
-			height: '46px'
+			width: '100',
+			height: '46'
 		},
 		processStart: {
 			name: '开始',
 			drag: true,
 			resize: true,
-			width: '110px',
-			height: '65px',
+			width: '110',
+			height: '65',
 			templ: '#img_templ',
 			img: 'processStart.png'
 		},
@@ -1924,8 +1991,8 @@
 			name: '分支',
 			drag: true,
 			resize: true,
-			width: '110px',
-			height: '65px',
+			width: '110',
+			height: '65',
 			templ: '#img_templ',
 			img: 'processSwitch.png'
 		},
@@ -1933,8 +2000,8 @@
 			name: '过程1',
 			drag: true,
 			resize: true,
-			width: '110px',
-			height: '65px',
+			width: '110',
+			height: '65',
 			templ: '#img_templ',
 			img: 'processCourse1.png'
 		},
@@ -1942,8 +2009,8 @@
 			name: '过程2',
 			drag: true,
 			resize: true,
-			width: '110px',
-			height: '65px',
+			width: '110',
+			height: '65',
 			templ: '#img_templ',
 			img: 'processCourse2.png'
 		},
@@ -1951,8 +2018,8 @@
 			name: '结束',
 			drag: true,
 			resize: true,
-			width: '110px',
-			height: '35px',
+			width: '110',
+			height: '35',
 			templ: '#img_templ',
 			img: 'processEnd.png'
 		},
@@ -1960,8 +2027,8 @@
 			name: '业务1',
 			drag: true,
 			resize: true,
-			width: '100px',
-			height: '50px',
+			width: '100',
+			height: '50',
 			templ: '#img_templ',
 			img: 'business1.png'
 		},
@@ -1969,8 +2036,8 @@
 			name: '业务2',
 			drag: true,
 			resize: true,
-			width: '100px',
-			height: '50px',
+			width: '100',
+			height: '50',
 			templ: '#img_templ',
 			img: 'business2.png'
 
@@ -1979,11 +2046,31 @@
 			name: '业务3',
 			drag: true,
 			resize: true,
-			width: '100px',
-			height: '50px',
+			width: '100',
+			height: '50',
 			templ: '#img_templ',
 			img: 'business3.png'
+		},
 
+		plan2: {
+			name: '面板2',
+			drag: true,
+			resize: true,
+			width: '80',
+			height: '80',
+			attr1: '1',
+			attr2: '2'
+
+		},
+		plan3: {
+			name: '面板3',
+			drag: true,
+			resize: true,
+			width: '80',
+			height: '80',
+			attr1: '1',
+			attr2: '2',
+			attr3: '3'
 		}
 	}
 

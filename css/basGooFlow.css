@@ -313,6 +313,32 @@ html{
 }
 
 
+.control-plan{
+	width: 80px;
+	height: 80px;
+	border: 1px solid #4a7ebb;
+	background: linear-gradient(to bottom , #e3edff , #a7c6ff);
+	background-color: #c8dbff;
+	border-radius:8px;
+}
+
+.plan-tab{
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	text-align: center;
+}
+.plan-tab td{
+	overflow: hidden;
+}
+ .plan-title{
+ 	border-right: 1px solid #4a7ebb;
+}
+ .plan-cnt{
+ 	border-top: 1px solid #4a7ebb;
+ 	height: 60%;
+}
+
 
 
 
@@ -351,6 +377,7 @@ html{
 }
 
 .swimlaneX{
+	position: relative;
 	box-sizing:border-box;
 	width: 100%;
 	height: 150px;
@@ -385,6 +412,7 @@ html{
 }
 
 .swimlaneY{
+	position: relative;
 	box-sizing:border-box; 
 	width: 150px;
 	height: 100%;

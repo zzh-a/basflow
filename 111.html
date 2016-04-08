@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>basDemo</title>
+    <link rel="stylesheet" href="./css/basGooFlow.css" type="text/css" >
+    <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
+    <style type="text/css">
+    .control-plan{
+    	width: 80px;
+    	height: 80px;
+    	border: 1px solid #4a7ebb;
+    	background: linear-gradient(to bottom , #e3edff , #a7c6ff);
+    	background-color: #c8dbff;
+    	border-radius:8px;
+    }
+    
+    .plan-tab{
+    	width: 100%;
+    	height: 100%;
+    	text-align: center;
+    }
+     .plan-title{
+     	border-right: 1px solid #4a7ebb;
+    }
+     .plan-cnt{
+     	border-top: 1px solid #4a7ebb;
+     	height: 60%;
+    }
+
+    .control-plan img{
+    	position: absolute;
+    	top: 0px;
+    	left: 0px;
+    	z-index: -1;
+    }
+
+    </style>
+  </head>
+  <body>
+    	<div style="margin:50px;">
+    		
+    		 <div onselectstart="return false" class="control control-plan">
+    				<table class="plan-tab">
+    					<tr>
+	    					<td width="33%" data-attrName="attr1" class="plan-title J_editAttr">
+	    						1
+	    					</td>
+	    					<td width="33%" data-attrName="attr2" class="plan-title J_editAttr">
+	    						2
+	    					</td>
+	    					<td data-attrName="attr3" class="J_editAttr">
+	    						3
+	    					</td>
+    					</tr>
+    					<tr>
+    						<td data-attrName="name" class="plan-cnt J_editAttr" colspan="3">
+    							name
+    						</td>
+    					</tr>
+    				</table>
+		     </div>
+
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+           	<br/>
+		     <div onselectstart="return false" class="control control-plan">
+    				<table class="plan-tab">
+    					<tr>
+	    					<td width="50%" data-attrName="attr1" class="plan-title J_editAttr">
+	    						1
+	    					</td>
+	    					<td data-attrName="attr2" class="J_editAttr">
+	    						2
+	    					</td>
+    					</tr>
+    					<tr>
+    						<td data-attrName="name" class="plan-cnt J_editAttr" colspan="3">
+    							name
+    						</td>
+    					</tr>
+    				</table>
+		     </div>
+    	</div>
+  </body>
+</html>

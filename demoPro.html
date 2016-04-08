@@ -4,21 +4,31 @@
     <meta charset="UTF-8">
     <title>basDemo</title>
     <link rel="stylesheet" href="./css/basGooFlow.css" type="text/css" >
-    <link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
-    <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
-    <script src="./lib/jqueryUI/jquery-ui.js"></script>
+
+    
+      <link rel="stylesheet" href="./lib/jqueryUI/jquery-ui.min.css">
+      <script src="./lib/jqueryUI/external/jquery/jquery.js"></script>
+      <script src="./lib/jqueryUI/jquery-ui.js"></script>
+    
+    <!--
+    <link rel="stylesheet" href="./lib/jqueryUI2/css/base/jquery-ui-1.10.4.custom.css">
+    <script src="./lib/jqueryUI2/js/jquery-1.10.2.js"></script>
+    <script src="./lib/jqueryUI2/js/jquery-ui-1.10.4.custom.js"></script>-->
+
     <script src="./lib/underscore/underscore-min.js"></script>
     <script src="./lib/doT.min.js"></script>
     <script src="./js/GooFlowPro.js"></script>
   </head>
   <body>
-    <div id="guide-h" class="guide"></div>
-    <div id="guide-v" class="guide"></div>
     <div id="basGooFlow"></div>
 
     <!-- template -->
+    <script id="attr_templ" type="text/x-dot-template">
+        
+    </script>
+
     <script id="swimlane_templ" type="text/x-dot-template">
-         <div id="{{= it.id }}" class="swimlane{{= it.type }}" onselectstart="return false">
+        <div id="{{= it.id }}" class="swimlane{{= it.type }}" onselectstart="return false">
           <div class="swimlane-title J_swimlaneTitle">{{= it.name }}</div>
           <div class="swimlane-content"></div>
         </div>
@@ -27,16 +37,59 @@
     <script id="label_templ" type="text/x-dot-template">
          <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;" onselectstart="return false" class="control control-label {{= it.isHelper ? 'helper' : '' }}">
             <div class="text">
-              <span class="J_text">{{= it.name }}</span>
+              <span data-attrName="name" class="J_editAttr">{{= it.name }}</span>
             </div>
             <div class="rs_remove J_remove"></div>
+         </div>
+    </script>
+
+    <script id="plan2_templ" type="text/x-dot-template">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;"  onselectstart="return false" class="control control-plan">
+            <table class="plan-tab">
+              <tr>
+                <td width="50%" data-attrName="attr1" class="plan-title J_editAttr">
+                   {{= it.attr1 || '' }}
+                </td>
+                <td data-attrName="attr2" class="J_editAttr">
+                  {{= it.attr2 || '' }}
+                </td>
+              </tr>
+              <tr>
+                <td data-attrName="name" class="plan-cnt J_editAttr" colspan="2">
+                  {{= it.name || '' }}
+                </td>
+              </tr>
+            </table>
+         </div>
+    </script>
+
+    <script id="plan3_templ" type="text/x-dot-template">
+        <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;"  onselectstart="return false" class="control control-plan">
+            <table class="plan-tab">
+              <tr>
+                <td width="33%" data-attrName="attr1" class="plan-title J_editAttr">
+                  {{= it.attr1 || '' }} 
+                </td>
+                <td width="33%" data-attrName="attr2" class="plan-title J_editAttr">
+                  {{= it.attr2 || '' }}
+                </td>
+                <td data-attrName="attr3" class="J_editAttr">
+                  {{= it.attr3 || '' }}
+                </td>
+              </tr>
+              <tr>
+                <td data-attrName="name" class="plan-cnt J_editAttr" colspan="3">
+                 {{= it.name || '' }}
+                </td>
+              </tr>
+            </table>
          </div>
     </script>
 
     <script id="img_templ" type="text/x-dot-template">
          <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;" onselectstart="return false" class="control {{= it.isHelper ? 'helper' : '' }}">
             <div class="text">
-              <span class="J_text">{{= it.name }}</span>
+              <span  data-attrName="name" class="J_editAttr">{{= it.name }}</span>
             </div>
             <div class="rs_remove J_remove"></div>
             <img src="img/group/{{= it.img }}" />
@@ -53,7 +106,7 @@
           controls: ['processStart','processSwitch','processCourse1','processCourse2','processEnd']
         },{
           name: '业务组件',
-          controls: ['business1','business2','business3']
+          controls: ['business1','business2','business3','plan2','plan3']
         }];
 
         window.basFlow = $('#basGooFlow').createGooFlow({
