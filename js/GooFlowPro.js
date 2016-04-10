@@ -3,6 +3,7 @@
 	var isIE678 = !+"\v1";
 	var useSVG = isIE678 ? 0 : 1;
 	var SVG_NS = 'http://www.w3.org/2000/svg';
+	var baseImgUrl = './img/group/';
 
 	function uuid(len, radix) {
 		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
@@ -134,6 +135,10 @@
 				this._initTools()
 			}
 
+			if(this.options.baseImgUrl){
+				baseImgUrl = this.options.baseImgUrl;
+			}
+
 			this._initWorkArea();
 			this._initLayout();
 
@@ -208,6 +213,9 @@
 		_switchPlan: function (type, attrList) {
 			var me = this,
 				index = type == 'attr' ? 1 : 0;
+			if(!me.options.haveTools){
+				return;
+			}
 
 			me.$navTabs.children().removeClass('active').eq(index).addClass('active');
 			me.$navCnts.children().hide().eq(index).show();
@@ -646,15 +654,33 @@
 		_initLayout: function () {
 			var me = this;
 			$(window).on('resize', function () {
+				if(me.options.width){
+					me.$container.css('width', me.options.width);
+				}
+
 				var height = me.options.height || $(window).height(),
-					workHeight = me.options.haveHead ? height - me.$head.height() : height,
-					workWidth = me.$work.width();
-				me.$tools.css('height', workHeight);
+					width = me.options.width || me.$container.width(),
+					workHeight = me.options.haveHead ? height - me.$head.outerHeight() : height,
+					workWidth = me.options.haveTools ?  width -  me.$tools.outerWidth() : width;
+
+
+				//最小宽度1000
+				workWidth = workWidth > 1000 ? workWidth : 1000;
+				
 				me.$work.css('height', workHeight);
 
-				me.$navCnts.css({
-					'height': workHeight - me.$navTabs.height()
-				});
+				if(me.options.haveHead){
+					me.$tools.css('height', workHeight);
+				}
+
+				if(me.options.haveTools){
+					me.$navCnts.css({
+						'height': workHeight - me.$navTabs.outerHeight()
+					});
+				}else{
+					me.$work.css('width', workWidth);
+				}
+
 
 				var workAreaTop = 0,
 					workAreaLeft = 0;
@@ -669,7 +695,7 @@
 					workAreaLeft = 40;
 					var laneXtop = me.$swimlaneY ? 41 : 0;
 					me.$swimlaneX.css({
-						width: '100%',
+						width: workWidth + 84,
 						height: workHeight * 3,
 						marginTop: laneXtop
 					});
@@ -680,7 +706,7 @@
 					workAreaTop = 40;
 					var laneYleft = me.$swimlaneX ? 42 : 0;
 					me.$swimlaneY.css({
-						width: workWidth - laneYleft - 20,
+						width: workWidth + laneYleft,
 						height: workHeight * 3,
 						marginLeft: laneYleft
 					});
@@ -689,13 +715,15 @@
 
 				//工作控件高度。默认为容器高度的三倍
 				me.$workArea.css({
-					width: workWidth - workAreaLeft - 20,
+					width: workWidth,
 					height: workHeight * 3,
 					top: workAreaTop,
 					left: workAreaLeft
 				});
+
+
 				$(me.$draw).css({
-					width: '100%',
+					width: workWidth,
 					height: workHeight * 3
 				});
 			}).trigger('resize');
@@ -1014,7 +1042,7 @@
 			}
 
 			var pick = _.pick(attrList, _.keys(attrList));
-			attrList = _.omit(pick, ['$el', 'marked', 'templ', 'drag', 'resize']);
+			attrList = _.omit(pick, ['$el', 'marked', 'templ', 'drag', 'resize', 'baseImgUrl']);
 
 			me._switchPlan('attr', attrList);
 			me.curId = id;
@@ -1138,6 +1166,22 @@
 		},
 
 
+		//清空工作区及已载入的数据
+		clearData: function () {
+			for (var key in this.controls) {
+				this.delControl(key);
+			}
+			for (var key in this.lines) {
+				this.delLine(key);
+			}
+			for (var key in this.swimlanes) {
+				this.delSwimlane(key);
+			}
+			this.controls = {};
+			this.swimlanes = {};
+			this.lines = {};
+		},
+
 
 		//载入一组数据
 		loadData: function (data) {
@@ -1146,6 +1190,13 @@
 			me.isEdit = false;
 
 			//if (data.title) me.setTitle(data.title);
+			if(!$.isEmptyObject(me.controls) || !$.isEmptyObject(me.swimlanes) || !$.isEmptyObject(me.lines)){
+				if(confirm('确定覆盖当前数据么？')){
+					me.clearData();
+				}else{
+					return false;
+				}
+			}
 
 			_.each(data.controls, function (v) {
 				me.addControl(v);
@@ -2192,6 +2243,7 @@
 							name: me.name,
 							type: me.type,
 							img: me.img,
+							baseImgUrl: baseImgUrl,
 							isHelper: true
 						});
 					},
@@ -2221,7 +2273,7 @@
 		this.top = 0;
 		this.width = 0;
 		this.height = 0;
-
+		this.baseImgUrl = baseImgUrl;
 		//继承config属性
 		$.extend(this, ToolsConfig[obj.type], obj);
 		this._init();
@@ -2279,7 +2331,7 @@
 		getToJSON: function () {
 			var me = this,
 				pick = _.pick(me, _.keys(me)),
-				json = _.omit(pick, ['$el', 'marked', 'templ']);
+				json = _.omit(pick, ['$el', 'marked', 'templ', 'baseImgUrl']);
 			return json;
 		},
 

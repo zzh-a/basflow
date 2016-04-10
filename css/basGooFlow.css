@@ -247,7 +247,7 @@ html{
 /*--------------组件样式---------------*/
 .ui-resizable-helper{
 	border: 1px dashed #8EA4C1;
-	z-index: 1100;
+	z-index: 9999;
 }
 
 

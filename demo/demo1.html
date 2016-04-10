@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>basDemo</title>
+    <link rel="stylesheet" href="../css/basGooFlow.css" type="text/css" >
+
+    
+    <link rel="stylesheet" href="../lib/jqueryUI/jquery-ui.min.css">
+    <script src="../lib/jqueryUI/external/jquery/jquery.js"></script>
+    <script src="../lib/jqueryUI/jquery-ui.js"></script>
+    
+    <!--
+    <link rel="stylesheet" href="./lib/jqueryUI2/css/base/jquery-ui-1.10.4.custom.css">
+    <script src="./lib/jqueryUI2/js/jquery-1.10.2.js"></script>
+    <script src="./lib/jqueryUI2/js/jquery-ui-1.10.4.custom.js"></script>-->
+
+    <script src="../lib/underscore/underscore-min.js"></script>
+    <script src="../lib/doT.min.js"></script>
+    <script src="../js/GooFlowPro.js"></script>
+
+
+    <style type="text/css">
+    .demo-box{
+      float: left;
+      margin: 20px;
+
+    }
+    .demo-btn{
+      padding: 5px 10px;
+    }
+    .demo-text{
+      display: block;
+      margin-top: 10px;
+      width: 400px;
+      height: 200px;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="basGooFlow" style="float: left"></div>
+
+
+    <div class="demo-box">
+        <button id="export" class="demo-btn">导出数据</button>
+        <textarea id="exportText" class="demo-text">
+        </textarea>
+
+
+        <button id="import" style="margin-top:30px;" class="demo-btn">导入数据</button>
+        <textarea id="importText" class="demo-text">
+          {"controls":[{"id":"CONTROLF572FFB0","name":"开始","type":"processStart","left":158,"top":25,"width":110,"height":65,"drag":true,"resize":true,"img":"processStart.png"},{"id":"CONTROL0B02D71B","name":"分支","type":"processSwitch","left":155,"top":154,"width":110,"height":65,"drag":true,"resize":true,"img":"processSwitch.png"},{"id":"CONTROLD3A7408F","name":"过程1","type":"processCourse1","left":28,"top":311,"width":110,"height":65,"drag":true,"resize":true,"img":"processCourse1.png"},{"id":"CONTROL6F047D9E","name":"过程1","type":"processCourse1","left":275,"top":305,"width":110,"height":65,"drag":true,"resize":true,"img":"processCourse1.png"},{"id":"CONTROL6E3613FA","name":"结束","type":"processEnd","left":151,"top":553,"width":110,"height":35,"drag":true,"resize":true,"img":"processEnd.png"},{"id":"CONTROLEE49CBE9","name":"过程2","type":"processCourse2","left":151,"top":423,"width":110,"height":65,"drag":true,"resize":true,"img":"processCourse2.png"},{"id":"CONTROL95020916","name":"业务1","type":"business1","left":424,"top":66,"width":100,"height":50,"drag":true,"resize":true,"img":"business1.png"},{"id":"CONTROLD54FAACF","name":"业务2","type":"business2","left":547,"top":65,"width":100,"height":50,"drag":true,"resize":true,"img":"business2.png"},{"id":"CONTROLA503CFD5","name":"业务3","type":"business3","left":668,"top":62,"width":100,"height":50,"drag":true,"resize":true,"img":"business3.png"}],"lines":[{"type":"sl","M":"","from":"CONTROLF572FFB0","to":"CONTROL0B02D71B","name":"判断"},{"type":"tb","M":261.5,"from":"CONTROL0B02D71B","to":"CONTROLD3A7408F","name":"分支1"},{"type":"tb","M":261.5,"from":"CONTROL0B02D71B","to":"CONTROL6F047D9E","name":"分支2"},{"type":"lr","M":83,"from":"CONTROLD3A7408F","to":"CONTROLEE49CBE9","name":"12"},{"type":"lr","M":333,"from":"CONTROL6F047D9E","to":"CONTROLEE49CBE9","name":"34"},{"type":"sl","M":"","from":"CONTROLEE49CBE9","to":"CONTROL6E3613FA","name":"结束"}],"swimlanes":[{"name":"泳道","type":"X","height":183,"width":150,"id":"SWIMLANEF48D4E42"},{"name":"泳道","type":"X","height":225,"width":150,"id":"SWIMLANEA05752D6"}]}
+        </textarea>
+
+
+
+
+        <button id="clear" style="margin-top:30px;" class="demo-btn">清空工作区</button>
+    </div>
+    <!-- template -->
+    <!-- 属性模板 -->
+    <script id="attr_templ" type="text/x-dot-template">
+        <table class="attr-table">
+            {{for(var k in it.attrList) { }}
+                <tr>
+                  <td>{{= k }}</td>
+                  <td><input type="text" readonly="true" class="attr-table-inp"  value="{{= it.attrList[k] }}" /></td>
+                </tr>
+            {{ } }}
+        </table>
+    </script>
+    <!-- 泳道道模板 -->
+    <script id="swimlane_templ" type="text/x-dot-template">
+        <div id="{{= it.id }}" class="swimlane{{= it.type }}" onselectstart="return false">
+          <div class="swimlane-title J_swimlaneTitle">{{= it.name }}</div>
+          <div class="swimlane-content"></div>
+        </div>
+    </script>
+    <!-- label模板 -->
+    <script id="label_templ" type="text/x-dot-template">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;" onselectstart="return false" class="control control-label {{= it.isHelper ? 'helper' : '' }}">
+            <div class="text">
+              <span data-attrName="name" class="J_editAttr">{{= it.name }}</span>
+            </div>
+            <div class="rs_remove J_remove"></div>
+         </div>
+    </script>
+    <!-- plan2模板 -->
+    <script id="plan2_templ" type="text/x-dot-template">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;"  onselectstart="return false" class="control control-plan">
+            <table class="plan-tab">
+              <tr>
+                <td width="50%" data-attrName="attr1" class="plan-title J_editAttr">
+                   {{= it.attr1 || '' }}
+                </td>
+                <td data-attrName="attr2" class="J_editAttr">
+                  {{= it.attr2 || '' }}
+                </td>
+              </tr>
+              <tr>
+                <td data-attrName="name" class="plan-cnt J_editAttr" colspan="2">
+                  {{= it.name || '' }}
+                </td>
+              </tr>
+            </table>
+         </div>
+    </script>
+    <!-- plan3模板 -->
+    <script id="plan3_templ" type="text/x-dot-template">
+        <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;"  onselectstart="return false" class="control control-plan">
+            <table class="plan-tab">
+              <tr>
+                <td width="33%" data-attrName="attr1" class="plan-title J_editAttr">
+                  {{= it.attr1 || '' }} 
+                </td>
+                <td width="33%" data-attrName="attr2" class="plan-title J_editAttr">
+                  {{= it.attr2 || '' }}
+                </td>
+                <td data-attrName="attr3" class="J_editAttr">
+                  {{= it.attr3 || '' }}
+                </td>
+              </tr>
+              <tr>
+                <td data-attrName="name" class="plan-cnt J_editAttr" colspan="3">
+                 {{= it.name || '' }}
+                </td>
+              </tr>
+            </table>
+         </div>
+    </script>
+    <!-- 通用图片模板 -->
+    <script id="img_templ" type="text/x-dot-template">
+         <div id="{{= it.id }}" data-type="{{= it.type }}" style="width: {{= it.width}}px;height:{{= it.height }}px;" onselectstart="return false" class="control {{= it.isHelper ? 'helper' : '' }}">
+            <div class="text">
+              <span  data-attrName="name" class="J_editAttr">{{= it.name }}</span>
+            </div>
+            <div class="rs_remove J_remove"></div>
+            <img src="{{= it.baseImgUrl }}{{= it.img }}" />
+         </div>
+    </script>
+
+    <script>
+     $(function(){
+         var toolsGroup = [{
+          name: '组件控件',
+          controls: ['label']
+        },{
+          name: '流程控件',
+          controls: ['processStart','processSwitch','processCourse1','processCourse2','processEnd']
+        },{
+          name: '业务组件',
+          controls: ['business1','business2','business3','plan2','plan3']
+        }];
+
+        var basFlow = $('#basGooFlow').createGooFlow({
+          baseImgUrl: '../img/group/',
+          toolsGroup : toolsGroup,
+          width: 1000,
+          swimlane: ['x']
+          // haveHead : false,
+          // haveTools: false
+        });
+
+
+
+
+
+        $('#export').on('click', function(){
+            var json = basFlow.getToJSON();
+            $('#exportText').val(JSON.stringify(json));
+        });
+
+
+         $('#import').on('click', function(){
+            var json = $('#importText').val();
+            if(!json){
+              return false;
+            }
+            basFlow.loadData(JSON.parse(json));
+        });
+
+
+        $('#clear').on('click', function(){
+            basFlow.clearData();
+        });
+
+     });
+    </script>
+
+
+
+    
+
+  </body>
+</html>
